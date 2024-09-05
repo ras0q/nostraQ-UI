@@ -1,10 +1,32 @@
-import type { Apis, Channel, Message } from '@traptitech/traq'
-import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { hexToBytes } from '@noble/hashes/utils'
+import {
+  UserAccountState,
+  type Apis,
+  type Channel,
+  type Message,
+  type UserDetail
+} from '@traptitech/traq'
 import { AxiosHeaders } from 'axios'
-import { kinds, SimplePool, type Event, type Filter } from 'nostr-tools'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { kinds, SimplePool } from 'nostr-tools'
+import type { Event, Filter } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
+import type { RelayRecord } from 'nostr-tools/relay'
 
 export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
+  let relays: RelayRecord | undefined = undefined
+
+  const getRelays = async (): Promise<RelayRecord> => {
+    if (relays === undefined) {
+      const newRelays = await window.nostr?.getRelays()
+      if (newRelays === undefined) throw new Error('undefined relays')
+
+      relays = newRelays
+    }
+
+    return relays
+  }
+
   apis.getMessages = async (
     channelId: string,
     limit?: number,
@@ -15,11 +37,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     order?: 'asc' | 'desc',
     options?: AxiosRequestConfig
   ): Promise<AxiosResponse<Message[], unknown>> => {
-    const relays = await window.nostr?.getRelays()
-    if (relays === undefined) throw new Error('undefined relays')
-
     const pool = new SimplePool()
-    const relayURLs = Object.keys(relays)
+    const relayURLs = Object.keys(await getRelays())
     const events = await querySync(pool, relayURLs, [
       {
         kinds: [
@@ -85,11 +104,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     channelId: string,
     options?: AxiosRequestConfig
   ): Promise<AxiosResponse<Channel, unknown>> => {
-    const relays = await window.nostr?.getRelays()
-    if (relays === undefined) throw new Error('undefined relays')
-
     const pool = new SimplePool()
-    const relayURLs = Object.keys(relays)
+    const relayURLs = Object.keys(await getRelays())
     const events = await querySync(pool, relayURLs, [
       {
         ids: [channelId],
@@ -148,6 +164,50 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     if (channel === undefined) throw new Error('channel not found')
 
     return pseudoResponse(channel, 200, 'OK')
+  }
+
+  const usernameDecoder = new TextDecoder()
+  apis.getUser = async (
+    userId: string, // pubkey
+    options?: AxiosRequestConfig
+  ): Promise<AxiosResponse<UserDetail, unknown>> => {
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await getRelays())
+    const event = (
+      await querySync(pool, relayURLs, [
+        {
+          kinds: [kinds.Metadata],
+          authors: [userId]
+        }
+      ])
+    ).at(0)
+    if (event === undefined) {
+      // @ts-expect-error 404
+      return pseudoResponse({}, 404, 'user not found')
+    }
+
+    const content = JSON.parse(event.content) as {
+      name: string
+      about: string
+      picture: string
+    } // FIXME: not found on nostr-tools?
+    const user: UserDetail = {
+      id: userId,
+      state: UserAccountState.active,
+      bot: false,
+      iconFileId: content.picture,
+      displayName: content.name,
+      name: usernameDecoder.decode(hexToBytes(userId).buffer).substring(0, 9),
+      twitterId: '',
+      lastOnline: null,
+      updatedAt: unixtimeToISO(event.created_at),
+      tags: [],
+      groups: [],
+      bio: content.about,
+      homeChannel: null
+    }
+
+    return pseudoResponse(user, 200, 'OK')
   }
 
   return apis
