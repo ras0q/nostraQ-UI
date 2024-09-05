@@ -1,7 +1,7 @@
 import type { Apis, Channel, Message } from '@traptitech/traq'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { AxiosHeaders } from 'axios'
-import { kinds, SimplePool, type Filter } from 'nostr-tools'
+import { kinds, SimplePool, type Event, type Filter } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 
 export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
@@ -20,7 +20,7 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
 
     const pool = new SimplePool()
     const relayURLs = Object.keys(relays)
-    await subscribeTillEose(pool, relayURLs, [
+    const events = await querySync(pool, relayURLs, [
       {
         kinds: [
           kinds.ChannelMessage,
@@ -33,7 +33,6 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
       }
     ])
 
-    const events = await pool.querySync(relayURLs, {})
     const messages = events.reduce<Message[]>((messages, e) => {
       switch (e.kind) {
         case kinds.ChannelMessage: {
@@ -91,7 +90,7 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
 
     const pool = new SimplePool()
     const relayURLs = Object.keys(relays)
-    await subscribeTillEose(pool, relayURLs, [
+    const events = await querySync(pool, relayURLs, [
       {
         ids: [channelId],
         kinds: [kinds.ChannelCreation]
@@ -102,7 +101,6 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
       }
     ])
 
-    const events = await pool.querySync(relayURLs, {})
     let channel: Channel | undefined = undefined
     for (const e of events) {
       switch (e.kind) {
@@ -173,17 +171,23 @@ const pseudoResponse = <T>(data: T, status: number, statusText: string) => {
   }
 }
 
-const subscribeTillEose = async (
+// pool.querySyncがfilterを1つしか取らないので暫定対処
+const querySync = async (
   pool: SimplePool,
   relayURLs: string[],
   filters: Filter[]
-) => {
-  await new Promise(resolve => {
+) =>
+  await new Promise<Event[]>(resolve => {
+    const events: Event[] = []
     const sub = pool.subscribeMany(relayURLs, filters, {
+      onevent(e) {
+        events.push(e)
+      },
       oneose() {
         sub.close() // 追加のストリーミングを受け取らない
-        resolve(null)
+      },
+      onclose() {
+        resolve(events)
       }
     })
   })
-}
