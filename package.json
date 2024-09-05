@@ -38,6 +38,7 @@
     "highlight.js": "^11.7.0",
     "idb-keyval": "^6.2.0",
     "mitt": "^3.0.0",
+    "nostr-tools": "^2.7.2",
     "pica": "^9.0.1",
     "skyway-js": "^4.4.5",
     "text-field-edit": "^3.2.0",
