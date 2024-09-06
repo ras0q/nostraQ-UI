@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@mdi/js": "^7.2.96",
-    "@noble/hashes": "^1.5.0",
     "@sapphi-red/web-noise-suppressor": "^0.3.3",
     "@traptitech/traq": "^3.17.0-3",
     "@traptitech/traq-markdown-it": "^6.3.0",

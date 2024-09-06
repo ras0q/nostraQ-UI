@@ -1,4 +1,3 @@
-import { hexToBytes } from '@noble/hashes/utils'
 import {
   UserAccountState,
   type Apis,
@@ -31,7 +30,7 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
 
   apis.getMessages = async (
     channelId: string,
-    limit?: number,
+    limit: number = 100,
     offset?: number,
     since?: string,
     until?: string,
@@ -98,7 +97,10 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     return pseudoResponse(
       order === 'asc' ? messages : messages.reverse(),
       200,
-      'OK'
+      'OK',
+      {
+        'x-traq-more': messages.length === limit ? 'true' : 'false'
+      }
     )
   }
 
@@ -235,7 +237,6 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     return pseudoResponse([], 200, 'OK')
   }
 
-  const usernameDecoder = new TextDecoder("utf-8")
   apis.getUser = async (
     userId: string, // pubkey
     options?: AxiosRequestConfig
@@ -286,13 +287,18 @@ const isoToUnixtime = (iso: string): number => new Date(iso).getTime() / 1000
 const unixtimeToISO = (unixtime: number): string =>
   new Date(unixtime * 1000).toISOString()
 
-const pseudoResponse = <T>(data: T, status: number, statusText: string) => {
+const pseudoResponse = <T>(
+  data: T,
+  status: number,
+  statusText: string,
+  headers?: Record<string, string>
+) => {
   return {
     data,
     status,
     statusText,
     headers: {
-      'x-traq-more': 'true' // メッセージの追加取得のためにとりあえず固定で置いている
+      ...headers
     },
     config: {
       headers: new AxiosHeaders()
