@@ -3,6 +3,7 @@ import {
   UserAccountState,
   type Apis,
   type Channel,
+  type ChannelList,
   type Message,
   type UserDetail
 } from '@traptitech/traq'
@@ -100,7 +101,66 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     )
   }
 
-  const getChannel = async (
+  apis.getChannels = async (
+    includeDm?: boolean,
+    options?: AxiosRequestConfig
+  ): Promise<AxiosResponse<ChannelList, unknown>> => {
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await getRelays())
+    const events = await querySync(pool, relayURLs, [
+      {
+        kinds: [kinds.ChannelCreation]
+      },
+      {
+        kinds: [kinds.ChannelMetadata]
+      }
+    ])
+
+    const publicChannels = events.reduce<Channel[]>((channels, e) => {
+      switch (e.kind) {
+        case kinds.ChannelCreation: {
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channels.push({
+            id: e.id,
+            parentId: null,
+            archived: false,
+            force: false,
+            topic: meta.about,
+            name: meta.name,
+            children: []
+          })
+
+          break
+        }
+
+        case kinds.ChannelMetadata: {
+          const i = channels.findIndex(c => c.id === e.id)
+          const channel = channels[i]
+          if (i === -1 || !channel) {
+            console.error('channel not found')
+            return channels
+          }
+
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channel.topic = meta.about
+          channel.name = meta.name
+
+          channels[i] = channel
+        }
+      }
+
+      return channels
+    }, [])
+
+    const channelList: ChannelList = {
+      public: publicChannels,
+      dm: []
+    }
+
+    return pseudoResponse(channelList, 200, 'OK')
+  }
+
+  apis.getChannel = async (
     channelId: string,
     options?: AxiosRequestConfig
   ): Promise<AxiosResponse<Channel, unknown>> => {
