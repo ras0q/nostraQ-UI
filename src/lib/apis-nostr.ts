@@ -5,6 +5,7 @@ import {
   type Channel,
   type ChannelList,
   type Message,
+  type Pin,
   type UserDetail
 } from '@traptitech/traq'
 import { AxiosHeaders } from 'axios'
@@ -49,7 +50,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
         ],
         limit,
         since: since ? isoToUnixtime(since) : undefined,
-        until: until ? isoToUnixtime(until) : undefined
+        until: until ? isoToUnixtime(until) : undefined,
+        '#e': [channelId]
       }
     ])
 
@@ -62,9 +64,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
           if (tag === undefined) throw new Error('tag not found')
 
           const [tagType, channelCreateEventId] = tag
-          if (tagType !== 'e') throw new Error('invalid tag type')
-          // if (channelCreateEventId !== channelId)
-          //   throw new Error('invalid channelId')
+          if (tagType !== 'e') throw `invalid tag type: ${tagType}`
+          if (channelCreateEventId !== channelId) throw 'invalid channelId'
 
           messages.push({
             id: e.id,
@@ -125,8 +126,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
             parentId: null,
             archived: false,
             force: false,
-            topic: meta.about,
-            name: meta.name,
+            topic: meta.about ?? '',
+            name: meta.name ?? '',
             children: []
           })
 
@@ -142,8 +143,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
           }
 
           const meta = JSON.parse(e.content) as ChannelMetadata
-          channel.topic = meta.about
-          channel.name = meta.name
+          channel.topic = meta.about ?? ''
+          channel.name = meta.name ?? ''
 
           channels[i] = channel
         }
@@ -189,8 +190,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
             parentId: null,
             archived: false,
             force: false,
-            topic: meta.about,
-            name: meta.name,
+            topic: meta.about ?? '',
+            name: meta.name ?? '',
             children: []
           }
 
@@ -213,8 +214,8 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
           const meta = JSON.parse(e.content) as ChannelMetadata
           if (channel === undefined) throw new Error('undefined channel')
 
-          channel.topic = meta.about
-          channel.name = meta.name
+          channel.topic = meta.about ?? ''
+          channel.name = meta.name ?? ''
 
           break
         }
@@ -224,6 +225,14 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     if (channel === undefined) throw new Error('channel not found')
 
     return pseudoResponse(channel, 200, 'OK')
+  }
+
+  // TODO: https://github.com/nostr-protocol/nips/blob/master/51.md
+  apis.getChannelPins = async (
+    channelId: string,
+    options?: AxiosRequestConfig
+  ): Promise<AxiosResponse<Pin[], unknown>> => {
+    return pseudoResponse([], 200, 'OK')
   }
 
   const usernameDecoder = new TextDecoder()
