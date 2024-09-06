@@ -10,7 +10,7 @@ import {
 } from '@traptitech/traq'
 import { AxiosHeaders } from 'axios'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { kinds, SimplePool } from 'nostr-tools'
+import { kinds, nip19, SimplePool } from 'nostr-tools'
 import type { Event, Filter } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 import type { RelayRecord } from 'nostr-tools/relay'
@@ -235,7 +235,7 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
     return pseudoResponse([], 200, 'OK')
   }
 
-  const usernameDecoder = new TextDecoder()
+  const usernameDecoder = new TextDecoder("utf-8")
   apis.getUser = async (
     userId: string, // pubkey
     options?: AxiosRequestConfig
@@ -266,7 +266,7 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
       bot: false,
       iconFileId: content.picture,
       displayName: content.name,
-      name: usernameDecoder.decode(hexToBytes(userId).buffer).substring(0, 9),
+      name: nip19.npubEncode(userId).substring(0, 10),
       twitterId: '',
       lastOnline: null,
       updatedAt: unixtimeToISO(event.created_at),
