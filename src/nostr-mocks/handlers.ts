@@ -118,7 +118,7 @@ export const handlers = [
         )
 
       return HttpResponse.json(
-        (order === 'asc' ? messages : messages.reverse()),
+        order === 'asc' ? messages : messages.reverse(),
         { status: 200 }
       )
     }
@@ -1307,7 +1307,7 @@ export const handlers = [
     if (channel === undefined) throw new Error('channel not found')
 
     return HttpResponse.json(channel, { status: 200 })
-  }),
+  })
   // http.patch(`${baseURL}/channels/:channelId`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
