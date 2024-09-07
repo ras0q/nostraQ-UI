@@ -17,19 +17,16 @@ import type { FileId } from '/@/types/entity-ids'
 import { DEV_SERVER } from '/@/lib/define'
 import type { AxiosError } from 'axios'
 import { constructFilesPath } from '/@/router'
-import { overrideApisToNostr } from './apis-nostr'
 
 export type { WebRTCUserStateSessionsInner as WebRTCUserStateSessions }
 
 export const BASE_PATH = '/api/v3'
 export const WEBSOCKET_ENDPOINT = '/api/v3/ws'
 
-const apis = await overrideApisToNostr(
-  new Apis(
-    new Configuration({
-      basePath: BASE_PATH
-    })
-  )
+const apis = new Apis(
+  new Configuration({
+    basePath: BASE_PATH
+  })
 )
 
 export default apis

@@ -26,6 +26,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.0.0",
     "@mdi/js": "^7.2.96",
     "@sapphi-red/web-noise-suppressor": "^0.3.3",
     "@traptitech/traq": "^3.17.0-3",
@@ -38,6 +39,7 @@
     "highlight.js": "^11.7.0",
     "idb-keyval": "^6.2.0",
     "mitt": "^3.0.0",
+    "msw": "^2.4.2",
     "nostr-tools": "^2.7.2",
     "pica": "^9.0.1",
     "skyway-js": "^4.4.5",
@@ -109,5 +111,10 @@
   "engines": {
     "node": "^20.15.0",
     "npm": "^10.7.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
