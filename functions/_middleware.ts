@@ -1,7 +1,8 @@
 // https://developers.cloudflare.com/pages/functions/middleware/
 
+/// <reference types="@cloudflare/workers-types" />
+
 import { DEV_SERVER_PROXY_HOST } from '../dev.config'
-import { Response, type PagesFunction } from '@cloudflare/workers-types'
 
 export const onRequest: PagesFunction<unknown> = async context => {
   const url = new URL(context.request.url)
