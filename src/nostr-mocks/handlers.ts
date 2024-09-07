@@ -1,22 +1,25 @@
 // generated with following command
 // $ npx msw-auto-mock https://raw.githubusercontent.com/traPtitech/traQ/master/docs/v3-api.yaml -o ./src/nostr-mocks
 
-import { HttpResponse, bypass, http, type JsonBodyType } from 'msw'
 import { faker } from '@faker-js/faker'
-import { BASE_PATH } from '/@/lib/apis'
-import {
-  UserAccountState,
-  type MyUserDetail,
-  type UserDetail,
-  UserPermission,
-  type Message,
-  type Channel,
-  type ChannelList
+import type {
+  Channel,
+  ChannelList,
+  ChannelViewState,
+  Message,
+  MyUserDetail,
+  UserDetail
 } from '@traptitech/traq'
-import { SimplePool } from 'nostr-tools/pool'
+import { UserAccountState, UserPermission } from '@traptitech/traq'
+import { randomUUID } from 'crypto'
+import { HttpResponse, bypass, http, ws, type JsonBodyType } from 'msw'
 import { kinds, nip19 } from 'nostr-tools'
-import Nostr, { isoToUnixtime, querySync, unixtimeToISO } from './nostr'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
+import { SimplePool } from 'nostr-tools/pool'
+import type { WebSocketEvent } from '../lib/websocket/events'
+import type { WebSocketCommand } from '../lib/websocket/send'
+import Nostr, { isoToUnixtime, querySync, unixtimeToISO } from './nostr'
+import { BASE_PATH, WEBSOCKET_ENDPOINT } from '/@/lib/apis'
 
 faker.seed(1)
 
@@ -29,7 +32,76 @@ const responseUnsupported = (body?: JsonBodyType, status: number = 200) =>
 // NOTE: 現状getMeはnostrから、loginはtraQから行っているためここで簡易的に管理
 let isLogined = false
 
+const wsConn = ws.link(
+  `ws://${new URL(document.URL).host}${WEBSOCKET_ENDPOINT}`
+)
+
+const sendWsEvent = <T extends keyof WebSocketEvent>(
+  clients: typeof wsConn.clients,
+  event: {
+    type: T
+    body: WebSocketEvent[T]
+  }
+) => {
+  const json = JSON.stringify(event)
+  clients.forEach(c => c.send(json))
+}
+
 export const handlers = [
+  wsConn.on('connection', ({ client }) => {
+    client.addEventListener('message', e => {
+      const clientSet = new Set([client])
+      const [command, ...args] = e.data.toString().split(':')
+      switch (command as WebSocketCommand) {
+        case 'viewstate': {
+          const [channelId, state] = args
+          if (!channelId || !state) throw 'Invalid args'
+
+          sendWsEvent(clientSet, {
+            type: 'USER_VIEWSTATE_CHANGED',
+            body: {
+              view_states: [
+                {
+                  key: randomUUID(),
+                  channelId: channelId,
+                  state: state as ChannelViewState
+                }
+              ]
+            }
+          })
+          break
+        }
+
+        case 'rtcstate': {
+          const [channelId, ...states] = args
+          if (!channelId) throw 'Invalid args'
+
+          sendWsEvent(clientSet, {
+            type: 'USER_WEBRTC_STATE_CHANGED',
+            body: {
+              user_id: client.id,
+              channel_id: channelId,
+              sessions: states
+                .flatMap((_, i, s) => (i % 2 === 0 ? [s.slice(i, i + 2)] : []))
+                .map(([state, sessionId]) => ({
+                  state: state ?? '',
+                  sessionId: sessionId ?? ''
+                }))
+            }
+          })
+          break
+        }
+
+        case 'timeline_streaming': {
+          break
+        }
+
+        default: {
+          throw 'Unknown command'
+        }
+      }
+    })
+  }),
   http.post(`${baseURL}/channels/:channelId/messages`, () =>
     responseUnsupported(undefined, 403)
   ),

@@ -40,7 +40,7 @@
     "highlight.js": "^11.7.0",
     "idb-keyval": "^6.2.0",
     "mitt": "^3.0.0",
-    "msw": "^2.4.2",
+    "msw": "^2.3.0-ws.rc-7",
     "nostr-tools": "^2.7.2",
     "pica": "^9.0.1",
     "skyway-js": "^4.4.5",
