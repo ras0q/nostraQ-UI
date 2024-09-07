@@ -11,7 +11,6 @@ import type {
   UserDetail
 } from '@traptitech/traq'
 import { UserAccountState, UserPermission } from '@traptitech/traq'
-import { randomUUID } from 'crypto'
 import { HttpResponse, bypass, http, ws, type JsonBodyType } from 'msw'
 import { kinds, nip19 } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
@@ -62,7 +61,7 @@ export const handlers = [
             body: {
               view_states: [
                 {
-                  key: randomUUID(),
+                  key: faker.string.uuid(),
                   channelId: channelId,
                   state: state as ChannelViewState
                 }
