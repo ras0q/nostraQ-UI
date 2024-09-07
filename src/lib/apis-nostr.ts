@@ -54,45 +54,48 @@ export const overrideApisToNostr = async (apis: Apis): Promise<Apis> => {
       }
     ])
 
-    const messages = events.reduce<Message[]>((messages, e) => {
-      switch (e.kind) {
-        case kinds.ChannelMessage: {
-          // TODO: support reply
-          // https://github.com/nostr-protocol/nips/blob/master/28.md#:~:text=Reply%20to%20another%20message%3A
-          const tag = e.tags.at(0)
-          if (tag === undefined) throw new Error('tag not found')
+    const messages = events
+      .reduce<Message[]>((messages, e) => {
+        switch (e.kind) {
+          case kinds.ChannelMessage: {
+            // TODO: support reply
+            // https://github.com/nostr-protocol/nips/blob/master/28.md#:~:text=Reply%20to%20another%20message%3A
+            const tag = e.tags.at(0)
+            if (tag === undefined) throw new Error('tag not found')
 
-          const [tagType, channelCreateEventId] = tag
-          if (tagType !== 'e') throw `invalid tag type: ${tagType}`
-          if (channelCreateEventId !== channelId) throw 'invalid channelId'
+            const [tagType, channelCreateEventId] = tag
+            if (tagType !== 'e') throw `invalid tag type: ${tagType}`
+            if (channelCreateEventId !== channelId) throw 'invalid channelId'
 
-          messages.push({
-            id: e.id,
-            userId: e.pubkey,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            channelId: channelCreateEventId!,
-            content: e.content,
-            createdAt: unixtimeToISO(e.created_at),
-            updatedAt: unixtimeToISO(e.created_at),
-            pinned: false,
-            stamps: [],
-            threadId: null
-          })
+            return messages.concat({
+              id: e.id,
+              userId: e.pubkey,
+              channelId: channelCreateEventId,
+              content: e.content,
+              createdAt: unixtimeToISO(e.created_at),
+              updatedAt: unixtimeToISO(e.created_at),
+              pinned: false,
+              stamps: [],
+              threadId: null
+            })
+          }
 
-          break
+          // TODO: implement
+          case kinds.ChannelHideMessage: {
+            break
+          }
+
+          // TODO: implement
+          case kinds.ChannelMuteUser: {
+            break
+          }
         }
 
-        case kinds.ChannelHideMessage: {
-          break
-        }
-
-        case kinds.ChannelMuteUser: {
-          break
-        }
-      }
-
-      return messages
-    }, [])
+        return messages
+      }, [])
+      .toSorted((l, r) =>
+        l.updatedAt < r.updatedAt ? 1 : l.updatedAt === r.updatedAt ? 0 : -1
+      )
 
     return pseudoResponse(
       order === 'asc' ? messages : messages.reverse(),
