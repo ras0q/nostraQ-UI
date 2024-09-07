@@ -1,9 +1,15 @@
 // generated with following command
 // $ npx msw-auto-mock https://raw.githubusercontent.com/traPtitech/traQ/master/docs/v3-api.yaml -o ./src/nostr-mocks
 
-import { HttpResponse, http } from 'msw'
+import { HttpResponse, bypass, http } from 'msw'
 import { faker } from '@faker-js/faker'
 import { BASE_PATH } from '/@/lib/apis'
+import type { User } from 'firebase/auth'
+import { UserAccountState, type MyUserDetail, type UserDetail, UserPermission } from '@traptitech/traq'
+import type { RelayRecord } from 'nostr-tools/relay'
+import { SimplePool } from 'nostr-tools/pool'
+import { kinds, nip19 } from 'nostr-tools'
+import Nostr, { querySync, unixtimeToISO } from './nostr'
 
 faker.seed(1)
 
@@ -17,6 +23,9 @@ const next = () => {
   }
   return i++
 }
+
+// NOTE: 現状getMeはnostrから、loginはtraQから行っているためここで簡易的に管理
+let isLogined = false
 
 export const handlers = [
   // http.post(`${baseURL}/channels/:channelId/messages`, async () => {
@@ -282,12 +291,49 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // // NOTE: /users/:userId より優先するために前に置いている
-  // http.get(`${baseURL}/users/me`, async () => {
-  //   const resultArray = [[await getGetMe200Response(), { status: 200 }]]
+  // NOTE: /users/:userId より優先するために前に置いている
+  http.get(`${baseURL}/users/me`, async () => {
+    if (!isLogined) return HttpResponse.json(undefined, { status: 401, statusText: 'Please login on traQ first!' })
 
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+    const pk = await Nostr.publicKey()
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await Nostr.relays())
+    const event = (
+      await querySync(pool, relayURLs, [
+        {
+          kinds: [kinds.Metadata],
+          authors: [pk]
+        }
+      ])
+    ).at(0)
+    if (event === undefined) {
+      return HttpResponse.json(undefined, { status: 404, statusText: 'user not found' })
+    }
+
+    const content = JSON.parse(event.content) as {
+      name: string
+      about: string
+      picture: string
+    } // FIXME: not found on nostr-tools?
+    const me: MyUserDetail = {
+      id: pk,
+      bio: content.about,
+      groups: [],
+      tags: [],
+      updatedAt: unixtimeToISO(event.created_at),
+      lastOnline: null,
+      twitterId: '',
+      name: nip19.npubEncode(pk).substring(0, 10),
+      displayName: content.name,
+      iconFileId: content.picture,
+      bot: false,
+      state: UserAccountState.active,
+      permissions: Object.values(UserPermission), // TODO: filter perm
+      homeChannel: null,
+    }
+
+    return HttpResponse.json(me, { status: 200 })
+  }),
   // http.patch(`${baseURL}/users/me`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
@@ -296,11 +342,45 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.get(`${baseURL}/users/:userId`, async info => {
-  //   const resultArray = [[await getGetUser200Response(), { status: 200 }]]
+  http.get(`${baseURL}/users/:userId`, async ({ params }) => {
+    const pk = params['userId'] as string
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await Nostr.relays())
+    const event = (
+      await querySync(pool, relayURLs, [
+        {
+          kinds: [kinds.Metadata],
+          authors: [pk]
+        }
+      ])
+    ).at(0)
+    if (event === undefined) {
+      return HttpResponse.json(undefined, { status: 404, statusText: 'user not found' })
+    }
 
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+    const content = JSON.parse(event.content) as {
+      name: string
+      about: string
+      picture: string
+    } // FIXME: not found on nostr-tools?
+    const user: UserDetail = {
+      id: pk,
+      bio: content.about,
+      groups: [],
+      tags: [],
+      updatedAt: unixtimeToISO(event.created_at),
+      lastOnline: null,
+      twitterId: '',
+      name: nip19.npubEncode(pk).substring(0, 10),
+      displayName: content.name,
+      iconFileId: content.picture,
+      bot: false,
+      state: UserAccountState.active,
+      homeChannel: null,
+    }
+
+    return HttpResponse.json(user, { status: 200 })
+  }),
   // http.patch(`${baseURL}/users/:userId`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
@@ -756,9 +836,32 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.post(`${baseURL}/login`, async () => {
-  //   return HttpResponse.json(undefined, { status: 204 })
-  // }),
+  http.post(`${baseURL}/login`, async ({ request }) => {
+    const response = await fetch(bypass(request))
+    const { status, statusText } = response
+    switch (status) {
+      case 204: {
+        isLogined = true
+        return HttpResponse.json(undefined, { status: 204 })
+      }
+
+      case 400: {
+        const json = await response.json() as { message: string }
+        if (json.message.includes('already logged in')) {
+          isLogined = true
+          return HttpResponse.json(undefined, { status: 204 })
+        }
+
+        isLogined = false
+        return HttpResponse.json(undefined, { status: status, statusText: `login on traQ failed ${statusText}` })
+      }
+
+      default: {
+        isLogined = false
+        return HttpResponse.json(undefined, { status: status, statusText: `login on traQ failed ${statusText}` })
+      }
+    }
+  }),
   // http.post(`${baseURL}/logout`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
