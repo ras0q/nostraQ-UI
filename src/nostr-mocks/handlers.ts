@@ -4,11 +4,10 @@
 import { HttpResponse, http } from 'msw'
 import { faker } from '@faker-js/faker'
 import { BASE_PATH } from '/@/lib/apis'
-import { DEV_SERVER_PROXY_HOST } from '../../dev.config'
 
 faker.seed(1)
 
-const baseURL = DEV_SERVER_PROXY_HOST + BASE_PATH
+const baseURL = BASE_PATH
 const MAX_ARRAY_LENGTH = 20
 
 let i = 0
@@ -20,1317 +19,1317 @@ const next = () => {
 }
 
 export const handlers = [
-  http.post(`${baseURL}/channels/:channelId/messages`, async () => {
-    const resultArray = [
-      [await getPostMessage201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/messages`, async () => {
-    const resultArray = [
-      [await getGetMessages200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/messages`, async () => {
-    const resultArray = [
-      [await getSearchMessages200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 503 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/messages/:messageId`, async () => {
-    const resultArray = [
-      [await getGetMessage200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/messages/:messageId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/messages/:messageId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/messages/:messageId/pin`, async () => {
-    const resultArray = [
-      [await getGetPin200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/messages/:messageId/pin`, async () => {
-    const resultArray = [
-      [await getCreatePin201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/messages/:messageId/pin`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/stats`, async () => {
-    const resultArray = [
-      [await getGetChannelStats200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/topic`, async () => {
-    const resultArray = [
-      [await getGetChannelTopic200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/channels/:channelId/topic`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/viewers`, async () => {
-    const resultArray = [
-      [await getGetChannelViewers200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/files`, async () => {
-    const resultArray = [
-      [await getPostFile201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 411 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/files`, async () => {
-    const resultArray = [
-      [await getGetFiles200Response(), { status: 200 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/files/:fileId/meta`, async () => {
-    const resultArray = [
-      [await getGetFileMeta200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/files/:fileId/thumbnail`, async () => {
-    const resultArray = [
-      [await getGetThumbnailImage200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/files/:fileId`, async () => {
-    const resultArray = [
-      [await getGetFile200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/files/:fileId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/pins`, async () => {
-    const resultArray = [
-      [await getGetChannelPins200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/messages/:messageId/stamps`, async () => {
-    const resultArray = [
-      [await getGetMessageStamps200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/messages/:messageId/stamps/:stampId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/messages/:messageId/stamps/:stampId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamps/:stampId`, async () => {
-    const resultArray = [
-      [await getGetStamp200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/stamps/:stampId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/stamps/:stampId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/stamps`, async () => {
-    const resultArray = [
-      [await getCreateStamp201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 409 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamps`, async () => {
-    const resultArray = [[await getGetStamps200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/stamp-history`, async () => {
-    const resultArray = [
-      [await getGetMyStampHistory200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/qr-code`, async () => {
-    const resultArray = [[await getGetMyQrCode200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamps/:stampId/stats`, async () => {
-    const resultArray = [
-      [await getGetStampStats200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  // NOTE: /users/:userId より優先するために前に置いている
-  http.get(`${baseURL}/users/me`, async () => {
-    const resultArray = [[await getGetMe200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/users/me`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId`, async info => {
-    const resultArray = [[await getGetUser200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/users/:userId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/groups/:groupId`, async () => {
-    const resultArray = [
-      [await getGetUserGroup200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/groups/:groupId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/groups/:groupId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/groups/:groupId/icon`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/groups/:groupId/members`, async () => {
-    const resultArray = [
-      [await getGetUserGroupMembers200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/groups/:groupId/members`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/groups/:groupId/members/:userId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/groups/:groupId/members/:userId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/groups`, async () => {
-    const resultArray = [[await getGetUserGroups200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/groups`, async () => {
-    const resultArray = [
-      [await getCreateUserGroup201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/oidc`, async () => {
-    const resultArray = [
-      [await getGetOidcUserInfo200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/:userId/messages`, async () => {
-    const resultArray = [
-      [await getPostDirectMessage201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId/messages`, async () => {
-    const resultArray = [
-      [await getGetDirectMessages200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId/stats`, async () => {
-    const resultArray = [
-      [await getGetUserStats200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/subscribers`, async () => {
-    const resultArray = [
-      [await getGetChannelSubscribers200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/channels/:channelId/subscribers`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/channels/:channelId/subscribers`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/subscriptions`, async () => {
-    const resultArray = [
-      [await getGetMyChannelSubscriptions200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/me/subscriptions/:channelId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/webhooks`, async () => {
-    const resultArray = [[await getGetWebhooks200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/webhooks`, async () => {
-    const resultArray = [
-      [await getCreateWebhook201Response(), { status: 201 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/webhooks/:webhookId`, async () => {
-    const resultArray = [
-      [await getGetWebhook200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/webhooks/:webhookId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/webhooks/:webhookId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/webhooks/:webhookId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/webhooks/:webhookId/icon`, async () => {
-    const resultArray = [
-      [await getGetWebhookIcon200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/webhooks/:webhookId/icon`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId/icon`, async () => {
-    const resultArray = [
-      [await getGetUserIcon200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/:userId/icon`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/icon`, async () => {
-    const resultArray = [
-      [await getGetMyIcon200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/me/icon`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/me/password`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 401 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/:userId/password`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/me/fcm-device`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/view-states`, async () => {
-    const resultArray = [
-      [await getGetMyViewStates200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users`, async () => {
-    const resultArray = [
-      [await getCreateUser201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users`, async () => {
-    const resultArray = [
-      [await getGetUsers200Response(), { status: 200 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/channels`, async () => {
-    const resultArray = [
-      [await getCreateChannel201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels`, async () => {
-    const resultArray = [[await getGetChannels200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId/tags`, async () => {
-    const resultArray = [
-      [await getGetUserTags200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/:userId/tags`, async () => {
-    const resultArray = [
-      [await getAddUserTag201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/users/:userId/tags/:tagId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/:userId/tags/:tagId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/tags/:tagId`, async () => {
-    const resultArray = [
-      [await getGetTag200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/tags`, async () => {
-    const resultArray = [[await getGetMyUserTags200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/me/tags`, async () => {
-    const resultArray = [
-      [await getAddMyUserTag201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/me/tags/:tagId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/users/me/tags/:tagId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/stars`, async () => {
-    const resultArray = [[await getGetMyStars200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/me/stars`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/me/stars/:channelId`, async () => {
-    const resultArray = [[undefined, { status: 204 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/unread`, async () => {
-    const resultArray = [
-      [await getGetMyUnreadChannels200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/version`, async () => {
-    const resultArray = [
-      [await getGetServerVersion200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/login`, async () => {
-    return HttpResponse.json(undefined, { status: 204 })
-  }),
-  http.post(`${baseURL}/logout`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 302 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/sessions`, async () => {
-    const resultArray = [[await getGetMySessions200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/me/sessions/:sessionId`, async () => {
-    const resultArray = [[undefined, { status: 204 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/activity/timeline`, async () => {
-    const resultArray = [
-      [await getGetActivityTimeline200Response(), { status: 200 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/ws`, async () => {
-    const resultArray = [[undefined, { status: 101 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/tokens`, async () => {
-    const resultArray = [[await getGetMyTokens200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/me/tokens/:tokenId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/public/icon/:username`, async () => {
-    const resultArray = [
-      [await getGetPublicUserIcon200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/clients/:clientId`, async () => {
-    const resultArray = [
-      [await getGetClient200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/clients/:clientId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/clients/:clientId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/clients/:clientId/tokens`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/clients`, async () => {
-    const resultArray = [[await getGetClients200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/clients`, async () => {
-    const resultArray = [
-      [await getCreateClient201Response(), { status: 201 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots`, async () => {
-    const resultArray = [
-      [await getCreateBot201Response(), { status: 201 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/bots`, async () => {
-    const resultArray = [[await getGetBots200Response(), { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/bots/ws`, async () => {
-    const resultArray = [[undefined, { status: 101 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/bots/:botId/icon`, async () => {
-    const resultArray = [
-      [await getGetBotIcon200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/bots/:botId/icon`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/bots/:botId`, async () => {
-    const resultArray = [
-      [await getGetBot200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/bots/:botId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/bots/:botId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots/:botId/actions/activate`, async () => {
-    const resultArray = [
-      [undefined, { status: 202 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots/:botId/actions/inactivate`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots/:botId/actions/reissue`, async () => {
-    const resultArray = [
-      [await getReissueBot200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/bots/:botId/logs`, async () => {
-    const resultArray = [
-      [await getGetBotLogs200Response(), { status: 200 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots/:botId/actions/join`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/bots/:botId/actions/leave`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/bots`, async () => {
-    const resultArray = [
-      [await getGetChannelBots200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/webrtc/authenticate`, async () => {
-    const resultArray = [
-      [await getPostWebRtcAuthenticate200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 503 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId`, async () => {
-    const resultArray = [
-      [await getGetChannel200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/channels/:channelId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/webrtc/state`, async () => {
-    const resultArray = [
-      [await getGetWebRtcState200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/clip-folders`, async () => {
-    const resultArray = [
-      [await getCreateClipFolder201Response(), { status: 201 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/clip-folders`, async () => {
-    const resultArray = [
-      [await getGetClipFolders200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/clip-folders/:folderId`, async () => {
-    const resultArray = [
-      [await getGetClipFolder200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/clip-folders/:folderId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/clip-folders/:folderId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/clip-folders/:folderId/messages`, async () => {
-    const resultArray = [
-      [await getClipMessage200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 409 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/clip-folders/:folderId/messages`, async () => {
-    const resultArray = [
-      [await getGetClips200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(
-    `${baseURL}/clip-folders/:folderId/messages/:messageId`,
-    async () => {
-      const resultArray = [
-        [undefined, { status: 204 }],
-        [undefined, { status: 404 }]
-      ]
-
-      return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-    }
-  ),
-  http.get(`${baseURL}/webhooks/:webhookId/messages`, async () => {
-    const resultArray = [
-      [await getGetWebhookMessages200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/channels/:channelId/events`, async () => {
-    const resultArray = [
-      [await getGetChannelEvents200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamp-palettes`, async () => {
-    const resultArray = [
-      [await getGetStampPalettes200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/stamp-palettes`, async () => {
-    const resultArray = [
-      [await getCreateStampPalette201Response(), { status: 201 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamp-palettes/:paletteId`, async () => {
-    const resultArray = [
-      [await getGetStampPalette200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/stamp-palettes/:paletteId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.patch(`${baseURL}/stamp-palettes/:paletteId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/activity/onlines`, async () => {
-    const resultArray = [
-      [await getGetOnlineUsers200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/stamps/:stampId/image`, async () => {
-    const resultArray = [
-      [await getGetStampImage200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/stamps/:stampId/image`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 404 }],
-      [undefined, { status: 413 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/users/me/unread/:channelId`, async () => {
-    const resultArray = [[undefined, { status: 204 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/groups/:groupId/admins/:userId`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/groups/:groupId/admins`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/groups/:groupId/admins`, async () => {
-    const resultArray = [
-      [await getGetUserGroupAdmins200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/oauth2/token`, async () => {
-    const resultArray = [
-      [await getPostOAuth2Token200Response(), { status: 200 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/oauth2/authorize/decide`, async () => {
-    const resultArray = [
-      [undefined, { status: 302 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/oauth2/authorize`, async () => {
-    const resultArray = [
-      [undefined, { status: 302 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/oauth2/authorize`, async () => {
-    const resultArray = [
-      [undefined, { status: 302 }],
-      [undefined, { status: 400 }],
-      [undefined, { status: 403 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/oauth2/revoke`, async () => {
-    const resultArray = [[undefined, { status: 200 }]]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/ex-accounts`, async () => {
-    const resultArray = [
-      [await getGetMyExternalAccounts200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/me/ex-accounts/link`, async () => {
-    const resultArray = [
-      [undefined, { status: 302 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.post(`${baseURL}/users/me/ex-accounts/unlink`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/:userId/dm-channel`, async () => {
-    const resultArray = [
-      [await getGetUserDmChannel200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/messages/:messageId/clips`, async () => {
-    const resultArray = [
-      [await getGetMessageClips200Response(), { status: 200 }],
-      [undefined, { status: 404 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/ogp`, async () => {
-    const resultArray = [
-      [await getGetOgp200Response(), { status: 200 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.delete(`${baseURL}/ogp/cache`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/settings`, async () => {
-    const resultArray = [
-      [await getGetUserSettings200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.get(`${baseURL}/users/me/settings/notify-citation`, async () => {
-    const resultArray = [
-      [await getGetMyNotifyCitation200Response(), { status: 200 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  }),
-  http.put(`${baseURL}/users/me/settings/notify-citation`, async () => {
-    const resultArray = [
-      [undefined, { status: 204 }],
-      [undefined, { status: 400 }]
-    ]
-
-    return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  })
+  // http.post(`${baseURL}/channels/:channelId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getPostMessage201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getGetMessages200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/messages`, async () => {
+  //   const resultArray = [
+  //     [await getSearchMessages200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 503 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/messages/:messageId`, async () => {
+  //   const resultArray = [
+  //     [await getGetMessage200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/messages/:messageId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/messages/:messageId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/messages/:messageId/pin`, async () => {
+  //   const resultArray = [
+  //     [await getGetPin200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/messages/:messageId/pin`, async () => {
+  //   const resultArray = [
+  //     [await getCreatePin201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/messages/:messageId/pin`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/stats`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelStats200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/topic`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelTopic200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/channels/:channelId/topic`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/viewers`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelViewers200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/files`, async () => {
+  //   const resultArray = [
+  //     [await getPostFile201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 411 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/files`, async () => {
+  //   const resultArray = [
+  //     [await getGetFiles200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/files/:fileId/meta`, async () => {
+  //   const resultArray = [
+  //     [await getGetFileMeta200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/files/:fileId/thumbnail`, async () => {
+  //   const resultArray = [
+  //     [await getGetThumbnailImage200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/files/:fileId`, async () => {
+  //   const resultArray = [
+  //     [await getGetFile200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/files/:fileId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/pins`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelPins200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/messages/:messageId/stamps`, async () => {
+  //   const resultArray = [
+  //     [await getGetMessageStamps200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/messages/:messageId/stamps/:stampId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/messages/:messageId/stamps/:stampId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamps/:stampId`, async () => {
+  //   const resultArray = [
+  //     [await getGetStamp200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/stamps/:stampId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/stamps/:stampId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/stamps`, async () => {
+  //   const resultArray = [
+  //     [await getCreateStamp201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 409 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamps`, async () => {
+  //   const resultArray = [[await getGetStamps200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/stamp-history`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyStampHistory200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/qr-code`, async () => {
+  //   const resultArray = [[await getGetMyQrCode200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamps/:stampId/stats`, async () => {
+  //   const resultArray = [
+  //     [await getGetStampStats200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // // NOTE: /users/:userId より優先するために前に置いている
+  // http.get(`${baseURL}/users/me`, async () => {
+  //   const resultArray = [[await getGetMe200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/users/me`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId`, async info => {
+  //   const resultArray = [[await getGetUser200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/users/:userId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/groups/:groupId`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserGroup200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/groups/:groupId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/groups/:groupId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/groups/:groupId/icon`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/groups/:groupId/members`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserGroupMembers200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/groups/:groupId/members`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/groups/:groupId/members/:userId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/groups/:groupId/members/:userId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/groups`, async () => {
+  //   const resultArray = [[await getGetUserGroups200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/groups`, async () => {
+  //   const resultArray = [
+  //     [await getCreateUserGroup201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/oidc`, async () => {
+  //   const resultArray = [
+  //     [await getGetOidcUserInfo200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/:userId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getPostDirectMessage201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getGetDirectMessages200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId/stats`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserStats200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/subscribers`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelSubscribers200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/channels/:channelId/subscribers`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/channels/:channelId/subscribers`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/subscriptions`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyChannelSubscriptions200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/me/subscriptions/:channelId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/webhooks`, async () => {
+  //   const resultArray = [[await getGetWebhooks200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/webhooks`, async () => {
+  //   const resultArray = [
+  //     [await getCreateWebhook201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/webhooks/:webhookId`, async () => {
+  //   const resultArray = [
+  //     [await getGetWebhook200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/webhooks/:webhookId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/webhooks/:webhookId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/webhooks/:webhookId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/webhooks/:webhookId/icon`, async () => {
+  //   const resultArray = [
+  //     [await getGetWebhookIcon200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/webhooks/:webhookId/icon`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId/icon`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserIcon200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/:userId/icon`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/icon`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyIcon200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/me/icon`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/me/password`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 401 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/:userId/password`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/me/fcm-device`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/view-states`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyViewStates200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users`, async () => {
+  //   const resultArray = [
+  //     [await getCreateUser201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users`, async () => {
+  //   const resultArray = [
+  //     [await getGetUsers200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/channels`, async () => {
+  //   const resultArray = [
+  //     [await getCreateChannel201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels`, async () => {
+  //   const resultArray = [[await getGetChannels200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId/tags`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserTags200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/:userId/tags`, async () => {
+  //   const resultArray = [
+  //     [await getAddUserTag201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/users/:userId/tags/:tagId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/:userId/tags/:tagId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/tags/:tagId`, async () => {
+  //   const resultArray = [
+  //     [await getGetTag200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/tags`, async () => {
+  //   const resultArray = [[await getGetMyUserTags200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/me/tags`, async () => {
+  //   const resultArray = [
+  //     [await getAddMyUserTag201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/me/tags/:tagId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/users/me/tags/:tagId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/stars`, async () => {
+  //   const resultArray = [[await getGetMyStars200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/me/stars`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/me/stars/:channelId`, async () => {
+  //   const resultArray = [[undefined, { status: 204 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/unread`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyUnreadChannels200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/version`, async () => {
+  //   const resultArray = [
+  //     [await getGetServerVersion200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/login`, async () => {
+  //   return HttpResponse.json(undefined, { status: 204 })
+  // }),
+  // http.post(`${baseURL}/logout`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 302 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/sessions`, async () => {
+  //   const resultArray = [[await getGetMySessions200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/me/sessions/:sessionId`, async () => {
+  //   const resultArray = [[undefined, { status: 204 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/activity/timeline`, async () => {
+  //   const resultArray = [
+  //     [await getGetActivityTimeline200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/ws`, async () => {
+  //   const resultArray = [[undefined, { status: 101 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/tokens`, async () => {
+  //   const resultArray = [[await getGetMyTokens200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/me/tokens/:tokenId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/public/icon/:username`, async () => {
+  //   const resultArray = [
+  //     [await getGetPublicUserIcon200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/clients/:clientId`, async () => {
+  //   const resultArray = [
+  //     [await getGetClient200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/clients/:clientId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/clients/:clientId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/clients/:clientId/tokens`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/clients`, async () => {
+  //   const resultArray = [[await getGetClients200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/clients`, async () => {
+  //   const resultArray = [
+  //     [await getCreateClient201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots`, async () => {
+  //   const resultArray = [
+  //     [await getCreateBot201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/bots`, async () => {
+  //   const resultArray = [[await getGetBots200Response(), { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/bots/ws`, async () => {
+  //   const resultArray = [[undefined, { status: 101 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/bots/:botId/icon`, async () => {
+  //   const resultArray = [
+  //     [await getGetBotIcon200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/bots/:botId/icon`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/bots/:botId`, async () => {
+  //   const resultArray = [
+  //     [await getGetBot200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/bots/:botId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/bots/:botId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots/:botId/actions/activate`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 202 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots/:botId/actions/inactivate`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots/:botId/actions/reissue`, async () => {
+  //   const resultArray = [
+  //     [await getReissueBot200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/bots/:botId/logs`, async () => {
+  //   const resultArray = [
+  //     [await getGetBotLogs200Response(), { status: 200 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots/:botId/actions/join`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/bots/:botId/actions/leave`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/bots`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelBots200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/webrtc/authenticate`, async () => {
+  //   const resultArray = [
+  //     [await getPostWebRtcAuthenticate200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 503 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannel200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/channels/:channelId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/webrtc/state`, async () => {
+  //   const resultArray = [
+  //     [await getGetWebRtcState200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/clip-folders`, async () => {
+  //   const resultArray = [
+  //     [await getCreateClipFolder201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/clip-folders`, async () => {
+  //   const resultArray = [
+  //     [await getGetClipFolders200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/clip-folders/:folderId`, async () => {
+  //   const resultArray = [
+  //     [await getGetClipFolder200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/clip-folders/:folderId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/clip-folders/:folderId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/clip-folders/:folderId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getClipMessage200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 409 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/clip-folders/:folderId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getGetClips200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(
+  //   `${baseURL}/clip-folders/:folderId/messages/:messageId`,
+  //   async () => {
+  //     const resultArray = [
+  //       [undefined, { status: 204 }],
+  //       [undefined, { status: 404 }]
+  //     ]
+
+  //     return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  //   }
+  // ),
+  // http.get(`${baseURL}/webhooks/:webhookId/messages`, async () => {
+  //   const resultArray = [
+  //     [await getGetWebhookMessages200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/channels/:channelId/events`, async () => {
+  //   const resultArray = [
+  //     [await getGetChannelEvents200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamp-palettes`, async () => {
+  //   const resultArray = [
+  //     [await getGetStampPalettes200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/stamp-palettes`, async () => {
+  //   const resultArray = [
+  //     [await getCreateStampPalette201Response(), { status: 201 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamp-palettes/:paletteId`, async () => {
+  //   const resultArray = [
+  //     [await getGetStampPalette200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/stamp-palettes/:paletteId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.patch(`${baseURL}/stamp-palettes/:paletteId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/activity/onlines`, async () => {
+  //   const resultArray = [
+  //     [await getGetOnlineUsers200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/stamps/:stampId/image`, async () => {
+  //   const resultArray = [
+  //     [await getGetStampImage200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/stamps/:stampId/image`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 404 }],
+  //     [undefined, { status: 413 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/users/me/unread/:channelId`, async () => {
+  //   const resultArray = [[undefined, { status: 204 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/groups/:groupId/admins/:userId`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/groups/:groupId/admins`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/groups/:groupId/admins`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserGroupAdmins200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/oauth2/token`, async () => {
+  //   const resultArray = [
+  //     [await getPostOAuth2Token200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/oauth2/authorize/decide`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 302 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/oauth2/authorize`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 302 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/oauth2/authorize`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 302 }],
+  //     [undefined, { status: 400 }],
+  //     [undefined, { status: 403 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/oauth2/revoke`, async () => {
+  //   const resultArray = [[undefined, { status: 200 }]]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/ex-accounts`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyExternalAccounts200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/me/ex-accounts/link`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 302 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.post(`${baseURL}/users/me/ex-accounts/unlink`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/:userId/dm-channel`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserDmChannel200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/messages/:messageId/clips`, async () => {
+  //   const resultArray = [
+  //     [await getGetMessageClips200Response(), { status: 200 }],
+  //     [undefined, { status: 404 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/ogp`, async () => {
+  //   const resultArray = [
+  //     [await getGetOgp200Response(), { status: 200 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.delete(`${baseURL}/ogp/cache`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/settings`, async () => {
+  //   const resultArray = [
+  //     [await getGetUserSettings200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.get(`${baseURL}/users/me/settings/notify-citation`, async () => {
+  //   const resultArray = [
+  //     [await getGetMyNotifyCitation200Response(), { status: 200 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // }),
+  // http.put(`${baseURL}/users/me/settings/notify-citation`, async () => {
+  //   const resultArray = [
+  //     [undefined, { status: 204 }],
+  //     [undefined, { status: 400 }]
+  //   ]
+
+  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
+  // })
 ]
 
 export function getPostMessage201Response() {
