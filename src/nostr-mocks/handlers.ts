@@ -272,14 +272,11 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.get(`${baseURL}/channels/:channelId/pins`, async () => {
-  //   const resultArray = [
-  //     [await getGetChannelPins200Response(), { status: 200 }],
-  //     [undefined, { status: 404 }]
-  //   ]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+  // TODO: support pins
+  // https://github.com/nostr-protocol/nips/blob/master/51.md
+  http.get(`${baseURL}/channels/:channelId/pins`, async () => {
+    return HttpResponse.json([], { status: 200 })
+  }),
   // http.get(`${baseURL}/messages/:messageId/stamps`, async () => {
   //   const resultArray = [
   //     [await getGetMessageStamps200Response(), { status: 200 }],
