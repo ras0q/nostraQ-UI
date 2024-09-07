@@ -369,12 +369,17 @@ export const handlers = [
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
   // NOTE: /users/:userId より優先するために前に置いている
-  http.get(`${baseURL}/users/me`, async () => {
-    if (!isLogined)
-      return HttpResponse.json(undefined, {
-        status: 401,
-        statusText: 'Please login on traQ first!'
-      })
+  http.get(`${baseURL}/users/me`, async ({ request }) => {
+    if (!isLogined) {
+      const response = await fetch(bypass(request))
+      if (response.status !== 200)
+        return HttpResponse.json(undefined, {
+          status: 401,
+          statusText: 'Please login on traQ first!'
+        })
+
+      isLogined = true
+    }
 
     const pk = await Nostr.publicKey()
     const pool = new SimplePool()
@@ -973,38 +978,7 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  http.post(`${baseURL}/login`, async ({ request }) => {
-    const response = await fetch(bypass(request))
-    const { status, statusText } = response
-    switch (status) {
-      case 204: {
-        isLogined = true
-        return HttpResponse.json(undefined, { status: 204 })
-      }
-
-      case 400: {
-        const json = (await response.json()) as { message: string }
-        if (json.message.includes('already logged in')) {
-          isLogined = true
-          return HttpResponse.json(undefined, { status: 204 })
-        }
-
-        isLogined = false
-        return HttpResponse.json(undefined, {
-          status: status,
-          statusText: `login on traQ failed ${statusText}`
-        })
-      }
-
-      default: {
-        isLogined = false
-        return HttpResponse.json(undefined, {
-          status: status,
-          statusText: `login on traQ failed ${statusText}`
-        })
-      }
-    }
-  }),
+  // http.post(`${baseURL}/login`, async ({ request }) => {}),
   // http.post(`${baseURL}/logout`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],

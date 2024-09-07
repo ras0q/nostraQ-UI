@@ -17,7 +17,6 @@ import type { FileId } from '/@/types/entity-ids'
 import { DEV_SERVER } from '/@/lib/define'
 import type { AxiosError } from 'axios'
 import { constructFilesPath } from '/@/router'
-import { overrideApisToNostr } from './apis-nostr'
 
 export type { WebRTCUserStateSessionsInner as WebRTCUserStateSessions }
 
