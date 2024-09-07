@@ -26,6 +26,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@cloudflare/workers-types": "^4.20240903.0",
     "@faker-js/faker": "^9.0.0",
     "@mdi/js": "^7.2.96",
     "@sapphi-red/web-noise-suppressor": "^0.3.3",
