@@ -5,11 +5,17 @@ import { HttpResponse, bypass, http } from 'msw'
 import { faker } from '@faker-js/faker'
 import { BASE_PATH } from '/@/lib/apis'
 import type { User } from 'firebase/auth'
-import { UserAccountState, type MyUserDetail, type UserDetail, UserPermission } from '@traptitech/traq'
+import {
+  UserAccountState,
+  type MyUserDetail,
+  type UserDetail,
+  UserPermission,
+  type Message
+} from '@traptitech/traq'
 import type { RelayRecord } from 'nostr-tools/relay'
 import { SimplePool } from 'nostr-tools/pool'
 import { kinds, nip19 } from 'nostr-tools'
-import Nostr, { querySync, unixtimeToISO } from './nostr'
+import Nostr, { isoToUnixtime, querySync, unixtimeToISO } from './nostr'
 
 faker.seed(1)
 
@@ -37,15 +43,83 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.get(`${baseURL}/channels/:channelId/messages`, async () => {
-  //   const resultArray = [
-  //     [await getGetMessages200Response(), { status: 200 }],
-  //     [undefined, { status: 400 }],
-  //     [undefined, { status: 404 }]
-  //   ]
+  http.get(
+    `${baseURL}/channels/:channelId/messages`,
+    async ({ request, params }) => {
+      const channelId = params['channelId'] as string
+      const query = new URL(request.url).searchParams
+      const limit = (query.get('limit') as unknown as number) ?? 100
+      // const offset = query.get("offset") as unknown as number ?? 0
+      const since = query.get('since')
+      const until = query.get('until')
+      // const inclusive = query.get('inclusive') === 'true'
+      const order = query.get('order') === 'asc' ? 'asc' : 'desc'
 
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+      const pool = new SimplePool()
+      const relayURLs = Object.keys(await Nostr.relays())
+      const events = await querySync(pool, relayURLs, [
+        {
+          kinds: [
+            kinds.ChannelMessage,
+            kinds.ChannelHideMessage,
+            kinds.ChannelMuteUser
+          ],
+          limit,
+          since: since ? isoToUnixtime(since) : undefined,
+          until: until ? isoToUnixtime(until) : undefined,
+          '#e': [channelId]
+        }
+      ])
+
+      const messages = events
+        .reduce<Message[]>((messages, e) => {
+          switch (e.kind) {
+            case kinds.ChannelMessage: {
+              // TODO: support reply
+              // https://github.com/nostr-protocol/nips/blob/master/28.md#:~:text=Reply%20to%20another%20message%3A
+              const tag = e.tags.at(0)
+              if (tag === undefined) throw 'tag not found'
+
+              const [tagType, channelCreateEventId] = tag
+              if (tagType !== 'e') throw `invalid tag type: ${tagType}`
+              if (channelCreateEventId !== channelId) throw 'invalid channelId'
+
+              return messages.concat({
+                id: e.id,
+                userId: e.pubkey,
+                channelId: channelCreateEventId,
+                content: e.content,
+                createdAt: unixtimeToISO(e.created_at),
+                updatedAt: unixtimeToISO(e.created_at),
+                pinned: false,
+                stamps: [],
+                threadId: null
+              })
+            }
+
+            // TODO: implement
+            case kinds.ChannelHideMessage: {
+              break
+            }
+
+            // TODO: implement
+            case kinds.ChannelMuteUser: {
+              break
+            }
+          }
+
+          return messages
+        }, [])
+        .sort((l, r) =>
+          l.updatedAt < r.updatedAt ? 1 : l.updatedAt === r.updatedAt ? 0 : -1
+        )
+
+      return HttpResponse.json(
+        ...(order === 'asc' ? messages : messages.reverse()),
+        { status: 200 }
+      )
+    }
+  ),
   // http.get(`${baseURL}/messages`, async () => {
   //   const resultArray = [
   //     [await getSearchMessages200Response(), { status: 200 }],
@@ -293,7 +367,11 @@ export const handlers = [
   // }),
   // NOTE: /users/:userId より優先するために前に置いている
   http.get(`${baseURL}/users/me`, async () => {
-    if (!isLogined) return HttpResponse.json(undefined, { status: 401, statusText: 'Please login on traQ first!' })
+    if (!isLogined)
+      return HttpResponse.json(undefined, {
+        status: 401,
+        statusText: 'Please login on traQ first!'
+      })
 
     const pk = await Nostr.publicKey()
     const pool = new SimplePool()
@@ -307,7 +385,10 @@ export const handlers = [
       ])
     ).at(0)
     if (event === undefined) {
-      return HttpResponse.json(undefined, { status: 404, statusText: 'user not found' })
+      return HttpResponse.json(undefined, {
+        status: 404,
+        statusText: 'user not found'
+      })
     }
 
     const content = JSON.parse(event.content) as {
@@ -329,7 +410,7 @@ export const handlers = [
       bot: false,
       state: UserAccountState.active,
       permissions: Object.values(UserPermission), // TODO: filter perm
-      homeChannel: null,
+      homeChannel: null
     }
 
     return HttpResponse.json(me, { status: 200 })
@@ -355,7 +436,10 @@ export const handlers = [
       ])
     ).at(0)
     if (event === undefined) {
-      return HttpResponse.json(undefined, { status: 404, statusText: 'user not found' })
+      return HttpResponse.json(undefined, {
+        status: 404,
+        statusText: 'user not found'
+      })
     }
 
     const content = JSON.parse(event.content) as {
@@ -376,7 +460,7 @@ export const handlers = [
       iconFileId: content.picture,
       bot: false,
       state: UserAccountState.active,
-      homeChannel: null,
+      homeChannel: null
     }
 
     return HttpResponse.json(user, { status: 200 })
@@ -846,22 +930,28 @@ export const handlers = [
       }
 
       case 400: {
-        const json = await response.json() as { message: string }
+        const json = (await response.json()) as { message: string }
         if (json.message.includes('already logged in')) {
           isLogined = true
           return HttpResponse.json(undefined, { status: 204 })
         }
 
         isLogined = false
-        return HttpResponse.json(undefined, { status: status, statusText: `login on traQ failed ${statusText}` })
+        return HttpResponse.json(undefined, {
+          status: status,
+          statusText: `login on traQ failed ${statusText}`
+        })
       }
 
       default: {
         isLogined = false
-        return HttpResponse.json(undefined, { status: status, statusText: `login on traQ failed ${statusText}` })
+        return HttpResponse.json(undefined, {
+          status: status,
+          statusText: `login on traQ failed ${statusText}`
+        })
       }
     }
-  }),
+  })
   // http.post(`${baseURL}/logout`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],

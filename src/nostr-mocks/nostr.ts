@@ -1,7 +1,7 @@
-import type { Event } from "nostr-tools"
-import type { Filter } from "nostr-tools/filter"
-import type { SimplePool } from "nostr-tools/pool"
-import type { RelayRecord } from "nostr-tools/relay"
+import type { Event } from 'nostr-tools'
+import type { Filter } from 'nostr-tools/filter'
+import type { SimplePool } from 'nostr-tools/pool'
+import type { RelayRecord } from 'nostr-tools/relay'
 
 export default class Nostr {
   static #publicKey: string | undefined
@@ -25,7 +25,8 @@ export default class Nostr {
   }
 }
 
-export const isoToUnixtime = (iso: string): number => new Date(iso).getTime() / 1000
+export const isoToUnixtime = (iso: string): number =>
+  new Date(iso).getTime() / 1000
 export const unixtimeToISO = (unixtime: number): string =>
   new Date(unixtime * 1000).toISOString()
 
