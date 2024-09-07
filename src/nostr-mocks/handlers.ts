@@ -4,7 +4,6 @@
 import { HttpResponse, bypass, http } from 'msw'
 import { faker } from '@faker-js/faker'
 import { BASE_PATH } from '/@/lib/apis'
-import type { User } from 'firebase/auth'
 import {
   UserAccountState,
   type MyUserDetail,
@@ -14,7 +13,6 @@ import {
   type Channel,
   type ChannelList
 } from '@traptitech/traq'
-import type { RelayRecord } from 'nostr-tools/relay'
 import { SimplePool } from 'nostr-tools/pool'
 import { kinds, nip19 } from 'nostr-tools'
 import Nostr, { isoToUnixtime, querySync, unixtimeToISO } from './nostr'
@@ -845,7 +843,8 @@ export const handlers = [
           const i = channels.findIndex(c => c.id === e.id)
           const channel = channels[i]
           if (i === -1 || !channel) {
-            console.error('channel not found')
+            // eslint-disable-next-line no-console
+            console.warn('channel not found')
             return channels
           }
 
