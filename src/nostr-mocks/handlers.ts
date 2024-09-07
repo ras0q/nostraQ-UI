@@ -51,7 +51,7 @@ export const handlers = [
     async ({ request, params }) => {
       const channelId = params['channelId'] as string
       const query = new URL(request.url).searchParams
-      const limit = (query.get('limit') as unknown as number) ?? 100
+      const limit = Number(query.get('limit') ?? '100')
       // const offset = query.get("offset") as unknown as number ?? 0
       const since = query.get('since')
       const until = query.get('until')
@@ -118,7 +118,7 @@ export const handlers = [
         )
 
       return HttpResponse.json(
-        ...(order === 'asc' ? messages : messages.reverse()),
+        (order === 'asc' ? messages : messages.reverse()),
         { status: 200 }
       )
     }
