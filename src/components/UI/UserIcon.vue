@@ -62,7 +62,7 @@ const styles = reactive({
     width: `${props.size}px`,
     height: `${props.size}px`,
     backgroundImage: userIconFileId.value
-      ? userIconFileId.value.startsWith("https")
+      ? userIconFileId.value.startsWith('https')
         ? `url(${userIconFileId.value})`
         : `url(${buildUserIconPath(userIconFileId.value)})`
       : undefined,

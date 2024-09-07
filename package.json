@@ -26,6 +26,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.0.0",
     "@mdi/js": "^7.2.96",
     "@sapphi-red/web-noise-suppressor": "^0.3.3",
     "@traptitech/traq": "^3.17.0-3",
@@ -110,5 +111,10 @@
   "engines": {
     "node": "^20.15.0",
     "npm": "^10.7.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
