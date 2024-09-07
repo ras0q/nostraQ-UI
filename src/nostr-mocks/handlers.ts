@@ -10,12 +10,15 @@ import {
   type MyUserDetail,
   type UserDetail,
   UserPermission,
-  type Message
+  type Message,
+  type Channel,
+  type ChannelList
 } from '@traptitech/traq'
 import type { RelayRecord } from 'nostr-tools/relay'
 import { SimplePool } from 'nostr-tools/pool'
 import { kinds, nip19 } from 'nostr-tools'
 import Nostr, { isoToUnixtime, querySync, unixtimeToISO } from './nostr'
+import type { ChannelMetadata } from 'nostr-tools/nip28'
 
 faker.seed(1)
 
@@ -807,11 +810,61 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.get(`${baseURL}/channels`, async () => {
-  //   const resultArray = [[await getGetChannels200Response(), { status: 200 }]]
+  http.get(`${baseURL}/channels`, async () => {
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await Nostr.relays())
+    const events = await querySync(pool, relayURLs, [
+      {
+        kinds: [kinds.ChannelCreation]
+      },
+      {
+        kinds: [kinds.ChannelMetadata]
+      }
+    ])
 
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+    const publicChannels = events.reduce<Channel[]>((channels, e) => {
+      switch (e.kind) {
+        case kinds.ChannelCreation: {
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channels.push({
+            id: e.id,
+            parentId: null,
+            archived: false,
+            force: false,
+            topic: meta.about ?? '',
+            name: meta.name ?? '',
+            children: []
+          })
+
+          break
+        }
+
+        case kinds.ChannelMetadata: {
+          const i = channels.findIndex(c => c.id === e.id)
+          const channel = channels[i]
+          if (i === -1 || !channel) {
+            console.error('channel not found')
+            return channels
+          }
+
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channel.topic = meta.about ?? ''
+          channel.name = meta.name ?? ''
+
+          channels[i] = channel
+        }
+      }
+
+      return channels
+    }, [])
+
+    const channelList: ChannelList = {
+      public: publicChannels,
+      dm: []
+    }
+
+    return HttpResponse.json(channelList, { status: 200 })
+  }),
   // http.get(`${baseURL}/users/:userId/tags`, async () => {
   //   const resultArray = [
   //     [await getGetUserTags200Response(), { status: 200 }],
@@ -951,7 +1004,7 @@ export const handlers = [
         })
       }
     }
-  })
+  }),
   // http.post(`${baseURL}/logout`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
@@ -1192,14 +1245,69 @@ export const handlers = [
 
   //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
   // }),
-  // http.get(`${baseURL}/channels/:channelId`, async () => {
-  //   const resultArray = [
-  //     [await getGetChannel200Response(), { status: 200 }],
-  //     [undefined, { status: 404 }]
-  //   ]
+  http.get(`${baseURL}/channels/:channelId`, async ({ params }) => {
+    const channelId = params['channelId'] as string
+    const pool = new SimplePool()
+    const relayURLs = Object.keys(await Nostr.relays())
+    const events = await querySync(pool, relayURLs, [
+      {
+        ids: [channelId],
+        kinds: [kinds.ChannelCreation]
+      },
+      {
+        kinds: [kinds.ChannelMetadata],
+        '#e': [channelId]
+      }
+    ])
 
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+    let channel: Channel | undefined = undefined
+    for (const e of events) {
+      switch (e.kind) {
+        case kinds.ChannelCreation: {
+          if (e.id !== channelId) throw new Error('invalid channelId')
+
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channel = {
+            id: e.id,
+            parentId: null,
+            archived: false,
+            force: false,
+            topic: meta.about ?? '',
+            name: meta.name ?? '',
+            children: []
+          }
+
+          break
+        }
+
+        case kinds.ChannelMetadata: {
+          const tag = e.tags.at(0)
+          if (tag === undefined) throw new Error('tag not found')
+
+          const [tagType, channelCreateEventId, relayURL, marker] = tag
+          if (tagType !== 'e') throw new Error('invalid tag type')
+          if (channelCreateEventId !== channelId)
+            throw new Error('invalid channelId')
+          if (!relayURL || !relayURLs.includes(relayURL))
+            throw new Error('invalid relay')
+          if (marker !== 'root' && marker !== 'reply')
+            throw new Error('invalid marker')
+
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          if (channel === undefined) throw new Error('undefined channel')
+
+          channel.topic = meta.about ?? ''
+          channel.name = meta.name ?? ''
+
+          break
+        }
+      }
+    }
+
+    if (channel === undefined) throw new Error('channel not found')
+
+    return HttpResponse.json(channel, { status: 200 })
+  }),
   // http.patch(`${baseURL}/channels/:channelId`, async () => {
   //   const resultArray = [
   //     [undefined, { status: 204 }],
