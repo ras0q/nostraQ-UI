@@ -11,7 +11,7 @@ import type {
   UserDetail
 } from '@traptitech/traq'
 import { UserAccountState, UserPermission } from '@traptitech/traq'
-import { HttpResponse, bypass, http, ws, type JsonBodyType } from 'msw'
+import { HttpResponse, http, ws, type JsonBodyType } from 'msw'
 import { kinds, nip19 } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 import { SimplePool } from 'nostr-tools/pool'
@@ -25,14 +25,17 @@ faker.seed(1)
 const baseURL = BASE_PATH
 const MAX_ARRAY_LENGTH = 20
 
-const responseUnsupported = (body?: JsonBodyType, status: number = 200) =>
+const responseUnsupported = (
+  body: JsonBodyType = undefined,
+  status: number = 400
+) => HttpResponse.json(body, { status, statusText: 'Unsupported on nostraQ' })
+
+const responseUnsupportedYet = (body?: JsonBodyType, status: number = 200) =>
   HttpResponse.json(body, { status, statusText: 'Unsupported yet' })
 
-// NOTE: 現状getMeはnostrから、loginはtraQから行っているためここで簡易的に管理
-let isLogined = false
-
+const documentURL = new URL(document.URL)
 const wsConn = ws.link(
-  `ws://${new URL(document.URL).host}${WEBSOCKET_ENDPOINT}`
+  `${documentURL.protocol === 'https' ? 'wss' : 'ws'}://${documentURL.host}${WEBSOCKET_ENDPOINT}`
 )
 
 const sendWsEvent = <T extends keyof WebSocketEvent>(
@@ -102,7 +105,7 @@ export const handlers = [
     })
   }),
   http.post(`${baseURL}/channels/:channelId/messages`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(
     `${baseURL}/channels/:channelId/messages`,
@@ -181,95 +184,86 @@ export const handlers = [
       )
     }
   ),
-  http.get(`${baseURL}/messages`, () => responseUnsupported([])),
+  http.get(`${baseURL}/messages`, () => responseUnsupportedYet([])),
   http.get(`${baseURL}/messages/:messageId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/messages/:messageId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/messages/:messageId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/messages/:messageId/pin`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.post(`${baseURL}/messages/:messageId/pin`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/messages/:messageId/pin`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/channels/:channelId/stats`, () =>
-    responseUnsupported(getGetChannelStats200Response())
+    responseUnsupportedYet(getGetChannelStats200Response())
   ),
   http.get(`${baseURL}/channels/:channelId/topic`, () =>
-    responseUnsupported(getGetChannelTopic200Response())
+    responseUnsupportedYet(getGetChannelTopic200Response())
   ),
   http.put(`${baseURL}/channels/:channelId/topic`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/channels/:channelId/viewers`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
-  http.post(`${baseURL}/files`, () => responseUnsupported(undefined, 403)),
-  http.get(`${baseURL}/files`, () => responseUnsupported([])),
+  http.post(`${baseURL}/files`, () => responseUnsupportedYet(undefined, 403)),
+  http.get(`${baseURL}/files`, () => responseUnsupportedYet([])),
   http.get(`${baseURL}/files/:fileId/meta`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/files/:fileId/thumbnail`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/files/:fileId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/files/:fileId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   // TODO: https://github.com/nostr-protocol/nips/blob/master/51.md
   http.get(`${baseURL}/channels/:channelId/pins`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
   http.get(`${baseURL}/messages/:messageId/stamps`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
   http.post(`${baseURL}/messages/:messageId/stamps/:stampId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/messages/:messageId/stamps/:stampId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/stamps/:stampId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/stamps/:stampId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/stamps/:stampId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.post(`${baseURL}/stamps`, () => responseUnsupported(undefined, 403)),
-  http.get(`${baseURL}/stamps`, () => responseUnsupported([])),
-  http.get(`${baseURL}/users/me/stamp-history`, () => responseUnsupported([])),
+  http.post(`${baseURL}/stamps`, () => responseUnsupportedYet(undefined, 403)),
+  http.get(`${baseURL}/stamps`, () => responseUnsupportedYet([])),
+  http.get(`${baseURL}/users/me/stamp-history`, () =>
+    responseUnsupportedYet([])
+  ),
   http.get(`${baseURL}/users/me/qr-code`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/stamps/:stampId/stats`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   // NOTE: /users/:userId より優先するために前に置いている
-  http.get(`${baseURL}/users/me`, async ({ request }) => {
-    if (!isLogined) {
-      const response = await fetch(bypass(request))
-      if (response.status !== 200)
-        return HttpResponse.json(undefined, {
-          status: 401,
-          statusText: 'Please login on traQ first!'
-        })
-
-      isLogined = true
-    }
-
+  http.get(`${baseURL}/users/me`, async () => {
     const pk = await Nostr.publicKey()
     const pool = new SimplePool()
     const relayURLs = Object.keys(await Nostr.relays())
@@ -312,7 +306,9 @@ export const handlers = [
 
     return HttpResponse.json(me, { status: 200 })
   }),
-  http.patch(`${baseURL}/users/me`, () => responseUnsupported(undefined, 403)),
+  http.patch(`${baseURL}/users/me`, () =>
+    responseUnsupportedYet(undefined, 403)
+  ),
   http.get(`${baseURL}/users/:userId`, async ({ params }) => {
     const pk = params['userId'] as string
     const pool = new SimplePool()
@@ -356,101 +352,105 @@ export const handlers = [
     return HttpResponse.json(user, { status: 200 })
   }),
   http.patch(`${baseURL}/users/:userId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/groups/:groupId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/groups/:groupId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/groups/:groupId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.put(`${baseURL}/groups/:groupId/icon`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/groups/:groupId/members`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.post(`${baseURL}/groups/:groupId/members`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/groups/:groupId/members/:userId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/groups/:groupId/members/:userId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/groups`, () => responseUnsupported([])),
-  http.post(`${baseURL}/groups`, () => responseUnsupported([], 403)),
+  http.get(`${baseURL}/groups`, () => responseUnsupportedYet([])),
+  http.post(`${baseURL}/groups`, () => responseUnsupportedYet([], 403)),
   http.get(`${baseURL}/users/me/oidc`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/users/:userId/messages`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/users/:userId/messages`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/users/:userId/stats`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/channels/:channelId/subscribers`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
   http.patch(`${baseURL}/channels/:channelId/subscribers`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.put(`${baseURL}/channels/:channelId/subscribers`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/users/me/subscriptions`, () => responseUnsupported([])),
+  http.get(`${baseURL}/users/me/subscriptions`, () =>
+    responseUnsupportedYet([])
+  ),
   http.put(`${baseURL}/users/me/subscriptions/:channelId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/webhooks`, () => responseUnsupported([])),
-  http.post(`${baseURL}/webhooks`, () => responseUnsupported(undefined, 403)),
+  http.get(`${baseURL}/webhooks`, () => responseUnsupportedYet([])),
+  http.post(`${baseURL}/webhooks`, () =>
+    responseUnsupportedYet(undefined, 403)
+  ),
   http.get(`${baseURL}/webhooks/:webhookId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.post(`${baseURL}/webhooks/:webhookId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/webhooks/:webhookId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/webhooks/:webhookId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/webhooks/:webhookId/icon`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/webhooks/:webhookId/icon`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/users/:userId/icon`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/users/:userId/icon`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/users/me/icon`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/users/me/icon`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.put(`${baseURL}/users/me/password`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.put(`${baseURL}/users/:userId/password`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/users/me/fcm-device`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/users/me/view-states`, () => responseUnsupported([])),
+  http.get(`${baseURL}/users/me/view-states`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/users`, async () => {
     return HttpResponse.json(undefined, {
       status: 403,
@@ -458,8 +458,10 @@ export const handlers = [
         'Cannot create a new account on nostraQ. Please register Nostr key with NIP-07.'
     })
   }),
-  http.get(`${baseURL}/users`, () => responseUnsupported([])),
-  http.post(`${baseURL}/channels`, () => responseUnsupported(undefined, 403)),
+  http.get(`${baseURL}/users`, () => responseUnsupportedYet([])),
+  http.post(`${baseURL}/channels`, () =>
+    responseUnsupportedYet(undefined, 403)
+  ),
   http.get(`${baseURL}/channels`, async () => {
     const pool = new SimplePool()
     const relayURLs = Object.keys(await Nostr.relays())
@@ -517,145 +519,115 @@ export const handlers = [
     return HttpResponse.json(channelList, { status: 200 })
   }),
   http.get(`${baseURL}/users/:userId/tags`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.post(`${baseURL}/users/:userId/tags`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/users/:userId/tags/:tagId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/users/:userId/tags/:tagId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/tags/:tagId`, () => responseUnsupported(undefined, 404)),
-  http.get(`${baseURL}/users/me/tags`, () => responseUnsupported([])),
+  http.get(`${baseURL}/tags/:tagId`, () =>
+    responseUnsupportedYet(undefined, 404)
+  ),
+  http.get(`${baseURL}/users/me/tags`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/users/me/tags`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/users/me/tags/:tagId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/users/me/tags/:tagId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/users/me/stars`, () => responseUnsupported([])),
+  http.get(`${baseURL}/users/me/stars`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/users/me/stars`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/users/me/stars/:channelId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/users/me/unread`, () => responseUnsupported([])),
+  http.get(`${baseURL}/users/me/unread`, () => responseUnsupportedYet([])),
   http.get(`${baseURL}/version`, () =>
-    responseUnsupported(getGetServerVersion200Response())
+    responseUnsupportedYet(getGetServerVersion200Response())
   ),
-  http.post(`${baseURL}/login`, async ({ request }) => {
-    const response = await fetch(bypass(request))
-    const { status, statusText } = response
-    if (status === 204) {
-      return HttpResponse.json(undefined, {
-        status,
-        headers: {
-          'Set-Cookie': response.headers.get('Cookie') ?? ''
-        }
-      })
-    } else if (status === 302) {
-      const { searchParams } = new URL(request.url)
-      const redirect = searchParams.get('redirect')
-      if (redirect) {
-        return HttpResponse.redirect(redirect, status)
-      }
-    }
-
-    return HttpResponse.json(await response.json(), { status, statusText })
-  }),
-  // http.post(`${baseURL}/logout`, async () => {
-  //   const resultArray = [
-  //     [undefined, { status: 204 }],
-  //     [undefined, { status: 302 }]
-  //   ]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
-  // http.get(`${baseURL}/users/me/sessions`, async () => {
-  //   const resultArray = [[await getGetMySessions200Response(), { status: 200 }]]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
-  // http.delete(`${baseURL}/users/me/sessions/:sessionId`, async () => {
-  //   const resultArray = [[undefined, { status: 204 }]]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
-  http.get(`${baseURL}/activity/timeline`, () => responseUnsupported([])),
-  // http.get(`${baseURL}/ws`, async () => {
-  //   const resultArray = [[undefined, { status: 101 }]]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
-  http.get(`${baseURL}/users/me/tokens`, () => responseUnsupported([])),
+  http.post(`${baseURL}/login`, () => responseUnsupported()),
+  http.post(`${baseURL}/logout`, () => responseUnsupported()),
+  http.get(`${baseURL}/users/me/sessions`, () =>
+    responseUnsupportedYet(undefined)
+  ),
+  http.delete(`${baseURL}/users/me/sessions/:sessionId`, () =>
+    responseUnsupportedYet(undefined, 403)
+  ),
+  http.get(`${baseURL}/activity/timeline`, () => responseUnsupportedYet([])),
+  http.get(`${baseURL}/ws`, () =>
+    HttpResponse.json(undefined, { status: 101 })
+  ),
+  http.get(`${baseURL}/users/me/tokens`, () => responseUnsupportedYet([])),
   http.delete(`${baseURL}/users/me/tokens/:tokenId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/public/icon/:username`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/clients/:clientId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/clients/:clientId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/clients/:clientId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/clients/:clientId/tokens`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/clients`, () => responseUnsupported([])),
-  http.post(`${baseURL}/clients`, () => responseUnsupported(undefined, 403)),
-  http.post(`${baseURL}/bots`, () => responseUnsupported([])),
-  http.get(`${baseURL}/bots`, () => responseUnsupported([])),
-  // http.get(`${baseURL}/bots/ws`, async () => {
-  //   const resultArray = [[undefined, { status: 101 }]]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+  http.get(`${baseURL}/clients`, () => responseUnsupportedYet([])),
+  http.post(`${baseURL}/clients`, () => responseUnsupportedYet(undefined, 403)),
+  http.post(`${baseURL}/bots`, () => responseUnsupportedYet([])),
+  http.get(`${baseURL}/bots`, () => responseUnsupportedYet([])),
+  http.get(`${baseURL}/bots/ws`, () =>
+    HttpResponse.json(undefined, { status: 101 })
+  ),
   http.get(`${baseURL}/bots/:botId/icon`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/bots/:botId/icon`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/bots/:botId`, () => responseUnsupported(undefined, 404)),
+  http.get(`${baseURL}/bots/:botId`, () =>
+    responseUnsupportedYet(undefined, 404)
+  ),
   http.delete(`${baseURL}/bots/:botId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/bots/:botId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/bots/:botId/actions/activate`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/bots/:botId/actions/inactivate`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/bots/:botId/actions/reissue`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/bots/:botId/logs`, () => responseUnsupported([])),
+  http.get(`${baseURL}/bots/:botId/logs`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/bots/:botId/actions/join`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/bots/:botId/actions/leave`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/channels/:channelId/bots`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
   http.post(`${baseURL}/webrtc/authenticate`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/channels/:channelId`, async ({ params }) => {
     const channelId = params['channelId'] as string
@@ -721,111 +693,99 @@ export const handlers = [
     return HttpResponse.json(channel, { status: 200 })
   }),
   http.patch(`${baseURL}/channels/:channelId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/webrtc/state`, () => responseUnsupported([])),
+  http.get(`${baseURL}/webrtc/state`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/clip-folders`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/clip-folders`, () => responseUnsupported([])),
+  http.get(`${baseURL}/clip-folders`, () => responseUnsupportedYet([])),
   http.get(`${baseURL}/clip-folders/:folderId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/clip-folders/:folderId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/clip-folders/:folderId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/clip-folders/:folderId/messages`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/clip-folders/:folderId/messages`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/clip-folders/:folderId/messages/:messageId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/webhooks/:webhookId/messages`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/channels/:channelId/events`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
-  http.get(`${baseURL}/stamp-palettes`, () => responseUnsupported([])),
+  http.get(`${baseURL}/stamp-palettes`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/stamp-palettes`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/stamp-palettes/:paletteId`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.delete(`${baseURL}/stamp-palettes/:paletteId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.patch(`${baseURL}/stamp-palettes/:paletteId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
-  http.get(`${baseURL}/activity/onlines`, () => responseUnsupported([])),
+  http.get(`${baseURL}/activity/onlines`, () => responseUnsupportedYet([])),
   http.get(`${baseURL}/stamps/:stampId/image`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.put(`${baseURL}/stamps/:stampId/image`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/users/me/unread/:channelId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.delete(`${baseURL}/groups/:groupId/admins/:userId`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/groups/:groupId/admins`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/groups/:groupId/admins`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
-  // http.post(`${baseURL}/oauth2/token`, async () => {}),
-  // http.post(`${baseURL}/oauth2/authorize/decide`, async () => {}),
-  // http.get(`${baseURL}/oauth2/authorize`, async () => {}),
-  // http.post(`${baseURL}/oauth2/authorize`, async () => {}),
-  // http.post(`${baseURL}/oauth2/revoke`, async () => {}),
-  http.get(`${baseURL}/users/me/ex-accounts`, () => responseUnsupported([])),
+  http.post(`${baseURL}/oauth2/token`, () => responseUnsupported()),
+  http.post(`${baseURL}/oauth2/authorize/decide`, () => responseUnsupported()),
+  http.get(`${baseURL}/oauth2/authorize`, () => responseUnsupported()),
+  http.post(`${baseURL}/oauth2/authorize`, () => responseUnsupported()),
+  http.post(`${baseURL}/oauth2/revoke`, () => responseUnsupported()),
+  http.get(`${baseURL}/users/me/ex-accounts`, () => responseUnsupportedYet([])),
   http.post(`${baseURL}/users/me/ex-accounts/link`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.post(`${baseURL}/users/me/ex-accounts/unlink`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   ),
   http.get(`${baseURL}/users/:userId/dm-channel`, () =>
-    responseUnsupported(undefined, 404)
+    responseUnsupportedYet(undefined, 404)
   ),
   http.get(`${baseURL}/messages/:messageId/clips`, () =>
-    responseUnsupported([])
+    responseUnsupportedYet([])
   ),
-  // http.get(`${baseURL}/ogp`, async () => {
-  //   const resultArray = [
-  //     [await getGetOgp200Response(), { status: 200 }],
-  //     [undefined, { status: 400 }]
-  //   ]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
-  // http.delete(`${baseURL}/ogp/cache`, async () => {
-  //   const resultArray = [
-  //     [undefined, { status: 204 }],
-  //     [undefined, { status: 400 }]
-  //   ]
-
-  //   return HttpResponse.json(...resultArray[next() % resultArray.length]!)
-  // }),
+  http.get(`${baseURL}/ogp`, () => responseUnsupportedYet(undefined, 404)),
+  http.delete(`${baseURL}/ogp/cache`, () =>
+    responseUnsupportedYet(undefined, 404)
+  ),
   http.get(`${baseURL}/users/me/settings`, () =>
-    responseUnsupported(getGetUserSettings200Response())
+    responseUnsupportedYet(getGetUserSettings200Response())
   ),
   http.get(`${baseURL}/users/me/settings/notify-citation`, () =>
-    responseUnsupported(getGetMyNotifyCitation200Response())
+    responseUnsupportedYet(getGetMyNotifyCitation200Response())
   ),
   http.put(`${baseURL}/users/me/settings/notify-citation`, () =>
-    responseUnsupported(undefined, 403)
+    responseUnsupportedYet(undefined, 403)
   )
 ]
 
