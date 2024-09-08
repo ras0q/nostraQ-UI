@@ -172,7 +172,7 @@ export const handlers = [
           return messages
         }, [])
         .sort((l, r) =>
-          l.updatedAt < r.updatedAt ? 1 : l.updatedAt === r.updatedAt ? 0 : -1
+          l.updatedAt < r.updatedAt ? -1 : l.updatedAt === r.updatedAt ? 0 : 1
         )
 
       return HttpResponse.json(
