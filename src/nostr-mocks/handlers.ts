@@ -35,7 +35,9 @@ const responseUnsupportedYet = (body?: JsonBodyType, status: number = 200) =>
 
 const documentURL = new URL(document.URL)
 const wsConn = ws.link(
-  `${documentURL.protocol === 'https' ? 'wss' : 'ws'}://${documentURL.host}${WEBSOCKET_ENDPOINT}`
+  `${documentURL.protocol === 'https' ? 'wss' : 'ws'}://${
+    documentURL.host
+  }${WEBSOCKET_ENDPOINT}`
 )
 
 const sendWsEvent = <T extends keyof WebSocketEvent>(
@@ -56,6 +58,8 @@ export const handlers = [
       const [command, ...args] = e.data.toString().split(':')
       switch (command as WebSocketCommand) {
         case 'viewstate': {
+          if (args.length < 2) return
+
           const [channelId, state] = args
           if (!channelId || !state) throw 'Invalid args'
 
