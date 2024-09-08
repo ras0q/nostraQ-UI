@@ -8,7 +8,8 @@ export default class Nostr {
   static async publicKey() {
     if (this.#publicKey === undefined) {
       const newPK = await window.nostr?.getPublicKey()
-      if (newPK === undefined) throw 'PublicKey not found. Please register your key to browser extension (NIP-07)'
+      if (newPK === undefined)
+        throw 'PublicKey not found. Please register your key to browser extension (NIP-07)'
       this.#publicKey = newPK
     }
     return this.#publicKey
@@ -18,7 +19,8 @@ export default class Nostr {
   static async relays() {
     if (this.#relays === undefined) {
       const newRelays = await window.nostr?.getRelays()
-      if (newRelays === undefined) throw 'Relays not found. Please register your key to browser extension (NIP-07)'
+      if (newRelays === undefined)
+        throw 'Relays not found. Please register your key to browser extension (NIP-07)'
       this.#relays = newRelays
     }
     return this.#relays
