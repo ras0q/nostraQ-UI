@@ -4,7 +4,6 @@
    * @type {import('/@/types/config').Config}
    */
   const config = {
-    name: 'nostraQ',
     services: [
       {
         label: 'Repository',
