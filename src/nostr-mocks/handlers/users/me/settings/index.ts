@@ -1,5 +1,5 @@
 import { http } from 'msw'
-import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { getGetUserSettings200Response, responseUnsupportedYet } from '/@/nostr-mocks/utils'
 
 const path = '${baseURL}/users/me/settings'
 

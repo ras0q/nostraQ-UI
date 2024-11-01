@@ -1,4 +1,5 @@
 import { http } from 'msw'
+import { responseUnsupported } from '../../utils'
 
 const path = '${baseURL}/logout'
 

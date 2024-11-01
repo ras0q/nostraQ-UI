@@ -1,4 +1,5 @@
 import { http } from 'msw'
+import { responseUnsupported } from '/@/nostr-mocks/utils'
 
 const path = '${baseURL}/oauth2/revoke'
 
