@@ -11,7 +11,8 @@ const getResolver = () => HttpResponse.json(undefined, { status: 101 })
 
 const documentURL = new URL(document.URL)
 const wsConn = ws.link(
-  `${documentURL.protocol === 'https' ? 'wss' : 'ws'}://${documentURL.host
+  `${documentURL.protocol === 'https' ? 'wss' : 'ws'}://${
+    documentURL.host
   }${WEBSOCKET_ENDPOINT}`
 )
 
@@ -26,7 +27,7 @@ const sendWsEvent = <T extends keyof WebSocketEvent>(
   clients.forEach(c => c.send(json))
 }
 
-const wsResolver = wsConn.on('connection', ({ client }) => {
+const wsResolver = wsConn.addEventListener('connection', ({ client }) => {
   client.addEventListener('message', e => {
     const clientSet = new Set([client])
     const [command, ...args] = e.data.toString().split(':')
