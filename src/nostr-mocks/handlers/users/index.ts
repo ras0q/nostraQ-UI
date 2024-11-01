@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/users'
+const path = BASE_PATH + '/users'
 
 const getResolver = () => responseUnsupportedYet([])
 

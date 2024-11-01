@@ -4,8 +4,9 @@ import { HttpResponse, http, ws } from 'msw'
 import { WEBSOCKET_ENDPOINT } from '/@/lib/apis'
 import type { WebSocketCommand } from '/@/lib/websocket'
 import type { WebSocketEvent } from '/@/lib/websocket/events'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/ws'
+const path = BASE_PATH + '/ws'
 
 const getResolver = () => HttpResponse.json(undefined, { status: 101 })
 

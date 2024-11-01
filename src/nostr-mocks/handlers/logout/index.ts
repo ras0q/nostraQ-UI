@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupported } from '../../utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/logout'
+const path = BASE_PATH + '/logout'
 
 const postResolver = () => responseUnsupported()
 

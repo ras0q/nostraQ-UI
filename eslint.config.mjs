@@ -16,7 +16,12 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['**/coverage', '**/dist', '**/node_modules', 'public/mockServiceWorker.js']
+    ignores: [
+      '**/coverage',
+      '**/dist',
+      '**/node_modules',
+      'public/mockServiceWorker.js'
+    ]
   },
   ...compat.extends(
     'eslint:recommended',

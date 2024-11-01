@@ -4,8 +4,9 @@ import { kinds, SimplePool } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 import Nostr, { querySync } from '/@/nostr-mocks/nostr'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/channels/:channelId'
+const path = BASE_PATH + '/channels/:channelId'
 
 const getResolver: HttpResponseResolver = async ({ params }) => {
   const channelId = params['channelId'] as string

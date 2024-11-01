@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/clip-folders/:folderId/messages/:messageId'
+const path = BASE_PATH + '/clip-folders/:folderId/messages/:messageId'
 
 const deleteResolver = () => responseUnsupportedYet(undefined, 403)
 

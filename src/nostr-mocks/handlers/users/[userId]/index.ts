@@ -3,8 +3,9 @@ import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
 import { type UserDetail, UserAccountState } from '@traptitech/traq'
 import { SimplePool, kinds, nip19 } from 'nostr-tools'
 import Nostr, { querySync, unixtimeToISO } from '/@/nostr-mocks/nostr'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/users/:userId'
+const path = BASE_PATH + '/users/:userId'
 
 const getResolver: HttpResponseResolver = async ({ params }) => {
   const pk = params['userId'] as string

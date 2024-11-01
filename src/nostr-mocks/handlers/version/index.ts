@@ -1,7 +1,11 @@
 import { http } from 'msw'
-import { getGetServerVersion200Response, responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import {
+  getGetServerVersion200Response,
+  responseUnsupportedYet
+} from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/version'
+const path = BASE_PATH + '/version'
 
 const getResolver = () =>
   responseUnsupportedYet(getGetServerVersion200Response())

@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupported } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/oauth2/authorize'
+const path = BASE_PATH + '/oauth2/authorize'
 
 const getResolver = () => responseUnsupported()
 

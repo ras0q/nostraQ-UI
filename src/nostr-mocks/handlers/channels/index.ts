@@ -4,8 +4,9 @@ import type { Channel, ChannelList } from '@traptitech/traq'
 import { SimplePool, kinds } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 import Nostr, { querySync } from '../../nostr'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/channels'
+const path = BASE_PATH + '/channels'
 
 const getResolver = async () => {
   const pool = new SimplePool()

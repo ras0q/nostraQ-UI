@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/webrtc/state'
+const path = BASE_PATH + '/webrtc/state'
 
 const getResolver = () => responseUnsupportedYet([])
 

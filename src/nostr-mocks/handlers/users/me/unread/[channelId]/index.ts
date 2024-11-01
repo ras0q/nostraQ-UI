@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/users/me/unread/:channelId'
+const path = BASE_PATH + '/users/me/unread/:channelId'
 
 const deleteResolver = () => responseUnsupportedYet(undefined, 403)
 

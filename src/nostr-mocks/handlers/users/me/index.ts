@@ -7,8 +7,9 @@ import {
 } from '@traptitech/traq'
 import { SimplePool, kinds, nip19 } from 'nostr-tools'
 import Nostr, { querySync, unixtimeToISO } from '/@/nostr-mocks/nostr'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/users/me'
+const path = BASE_PATH + '/users/me'
 
 const getResolver = async () => {
   const pk = await Nostr.publicKey()
