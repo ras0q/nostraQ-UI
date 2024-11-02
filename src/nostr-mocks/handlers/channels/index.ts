@@ -20,34 +20,40 @@ const getResolver = async () => {
     }
   ])
   const publicChannels = events.reduce<Channel[]>((channels, e) => {
-    switch (e.kind) {
-      case kinds.ChannelCreation: {
-        const meta = JSON.parse(e.content) as ChannelMetadata
-        channels.push({
-          id: e.id,
-          parentId: null,
-          archived: false,
-          force: false,
-          topic: meta.about ?? '',
-          name: meta.name ?? '',
-          children: []
-        })
-        break
-      }
-      case kinds.ChannelMetadata: {
-        const i = channels.findIndex(c => c.id === e.id)
-        const channel = channels[i]
-        if (i === -1 || !channel) {
-          // eslint-disable-next-line no-console
-          console.warn('channel not found')
-          return channels
+    try {
+      switch (e.kind) {
+        case kinds.ChannelCreation: {
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channels.push({
+            id: e.id,
+            parentId: null,
+            archived: false,
+            force: false,
+            topic: meta.about ?? '',
+            name: meta.name ?? '',
+            children: []
+          })
+          break
         }
-        const meta = JSON.parse(e.content) as ChannelMetadata
-        channel.topic = meta.about ?? ''
-        channel.name = meta.name ?? ''
-        channels[i] = channel
+        case kinds.ChannelMetadata: {
+          const i = channels.findIndex(c => c.id === e.id)
+          const channel = channels[i]
+          if (i === -1 || !channel) {
+            // eslint-disable-next-line no-console
+            console.warn('channel not found')
+            return channels
+          }
+          const meta = JSON.parse(e.content) as ChannelMetadata
+          channel.topic = meta.about ?? ''
+          channel.name = meta.name ?? ''
+          channels[i] = channel
+        }
       }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e)
     }
+
     return channels
   }, [])
   const channelList: ChannelList = {
