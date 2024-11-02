@@ -5,6 +5,7 @@ import { SimplePool, kinds } from 'nostr-tools'
 import type { ChannelMetadata } from 'nostr-tools/nip28'
 import Nostr, { querySync } from '../../nostr'
 import { BASE_PATH } from '/@/lib/apis'
+import { ulid } from 'ulid'
 
 const path = BASE_PATH + '/channels'
 
@@ -57,13 +58,58 @@ const getResolver = async () => {
     return channels
   }, [])
 
+  // Split channels that contain '/' into nested channels
+  const nestedChannels = publicChannels.filter(c => c.name.includes('/'))
+  for (const nestedChannel of nestedChannels) {
+    const paths = nestedChannel.name.split('/')
+
+    let child: Channel | null = null
+    for (let i = paths.length - 1; i >= 0; i--) {
+      const fullpath = paths.slice(0, i + 1).join('/')
+      const j = publicChannels.findIndex(c => c.name === fullpath)
+
+      if (j === -1) {
+        const newChannel: Channel = {
+          id: ulid(),
+          parentId: null,
+          archived: false,
+          force: false,
+          topic: '',
+          name: fullpath,
+          children: child ? [child.id] : []
+        }
+        publicChannels.push(newChannel)
+        if (child) {
+          child.parentId = newChannel.id
+        }
+        child = newChannel
+      } else {
+        const channel = publicChannels[j]!
+        if (child) {
+          child.parentId = channel.id
+          if (!channel.children.includes(child.id)) {
+            channel.children.push(child.id)
+          }
+        }
+        child = channel
+      }
+    }
+  }
+
+  for (const channel of publicChannels) {
+    if (channel.name.includes('/')) {
+      channel.name = channel.name.split('/').pop()!
+    }
+  }
+
+  // Prevent duplicate channel names
   const nameMap = new Map<string, number>()
   publicChannels.forEach(channel => {
-    const name = channel.name
-    const count = nameMap.get(name) ?? 0
-    nameMap.set(name, count + 1)
+    const key = `${channel.parentId ?? ''}_${channel.name}`
+    const count = nameMap.get(key) ?? 0
+    nameMap.set(key, count + 1)
     if (count > 0) {
-      channel.name = `${name}_${count}`
+      channel.name = `${channel.name}_${count}`
     }
   })
 
