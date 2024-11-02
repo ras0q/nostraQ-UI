@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/webhooks/:webhookId/icon'
+const path = BASE_PATH + '/webhooks/:webhookId/icon'
 
 const getResolver = () => responseUnsupportedYet(undefined, 404)
 

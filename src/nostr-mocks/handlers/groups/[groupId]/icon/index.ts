@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/groups/:groupId/icon'
+const path = BASE_PATH + '/groups/:groupId/icon'
 
 const putResolver = () => responseUnsupportedYet(undefined, 403)
 

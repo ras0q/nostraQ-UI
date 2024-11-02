@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/channels/:channelId/viewers'
+const path = BASE_PATH + '/channels/:channelId/viewers'
 
 const getResolver = () => responseUnsupportedYet([])
 

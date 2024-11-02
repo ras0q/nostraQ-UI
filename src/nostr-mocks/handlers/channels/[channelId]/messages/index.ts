@@ -7,8 +7,9 @@ import Nostr, {
 } from '/@/nostr-mocks/nostr'
 import { kinds, SimplePool } from 'nostr-tools'
 import type { Message } from '@traptitech/traq'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/channels/:channelId/messages'
+const path = BASE_PATH + '/channels/:channelId/messages'
 
 const getResolver: HttpResponseResolver = async ({ request, params }) => {
   const channelId = params['channelId'] as string

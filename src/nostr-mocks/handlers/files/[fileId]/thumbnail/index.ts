@@ -1,7 +1,8 @@
 import { http } from 'msw'
 import { responseUnsupportedYet } from '/@/nostr-mocks/utils'
+import { BASE_PATH } from '/@/lib/apis'
 
-const path = '${baseURL}/files/:fileId/thumbnail'
+const path = BASE_PATH + '/files/:fileId/thumbnail'
 
 const getResolver = () => responseUnsupportedYet(undefined, 404)
 
