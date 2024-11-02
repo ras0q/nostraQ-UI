@@ -30,7 +30,7 @@ const getResolver = async () => {
             archived: false,
             force: false,
             topic: meta.about ?? '',
-            name: meta.name ?? '',
+            name: meta.name ?? 'UNTITLED',
             children: []
           })
           break
@@ -56,6 +56,17 @@ const getResolver = async () => {
 
     return channels
   }, [])
+
+  const nameMap = new Map<string, number>()
+  publicChannels.forEach(channel => {
+    const name = channel.name
+    const count = nameMap.get(name) ?? 0
+    nameMap.set(name, count + 1)
+    if (count > 0) {
+      channel.name = `${name}_${count}`
+    }
+  })
+
   const channelList: ChannelList = {
     public: publicChannels,
     dm: []
