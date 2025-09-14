@@ -66,9 +66,9 @@ const getResolver = async () => {
     let child: Channel | null = null
     for (let i = paths.length - 1; i >= 0; i--) {
       const fullpath = paths.slice(0, i + 1).join('/')
-      const j = publicChannels.findIndex(c => c.name === fullpath)
+      const channel = publicChannels.find(c => c.name === fullpath)
 
-      if (j === -1) {
+      if (channel === undefined) {
         const newChannel: Channel = {
           id: ulid(),
           parentId: null,
@@ -84,7 +84,6 @@ const getResolver = async () => {
         }
         child = newChannel
       } else {
-        const channel = publicChannels[j]!
         if (child) {
           child.parentId = channel.id
           if (!channel.children.includes(child.id)) {
@@ -97,8 +96,9 @@ const getResolver = async () => {
   }
 
   for (const channel of publicChannels) {
-    if (channel.name.includes('/')) {
-      channel.name = channel.name.split('/').pop()!
+    const basename = channel.name.split('/').at(-1)
+    if (basename) {
+      channel.name = basename
     }
   }
 

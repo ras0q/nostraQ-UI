@@ -14,6 +14,6 @@ const postResolver = async () => {
   })
 }
 
-const handlers = [http.get(path, getResolver)]
+const handlers = [http.get(path, getResolver), http.post(path, postResolver)]
 
 export default handlers
