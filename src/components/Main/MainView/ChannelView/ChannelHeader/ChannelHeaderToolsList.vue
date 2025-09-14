@@ -2,15 +2,15 @@
   <div :class="$style.container">
     <template v-if="!isMobile">
       <header-tools-item
-        v-if="isQallFeatureEnabled"
+        v-if="true"
         icon-mdi
-        :icon-name="qallIconName"
+        :icon-name="isCallingHere ? 'phone' : 'phone-outline'"
         :class="$style.qallIcon"
-        :disabled="!canToggleQall"
-        :data-is-active="$boolAttr(isQallSessionOpened)"
-        :data-is-joined="$boolAttr(canEndQall)"
-        :tooltip="qallLabel"
-        @click="toggleQall"
+        :disabled="disabled"
+        :data-is-active="$boolAttr(isCallingHere)"
+        :data-is-joined="$boolAttr(isCallingHere)"
+        :tooltip="'Qallボタン'"
+        @click="joinQall(props.channelId)"
       />
       <header-tools-item
         :class="$style.notificationIcon"
@@ -22,9 +22,9 @@
       />
     </template>
     <header-tools-item
-      v-if="isStared"
+      v-if="isStarred"
       :class="$style.starIcon"
-      data-is-stared
+      data-is-starred
       icon-name="star"
       tooltip="お気に入りから外す"
       @click="unstarChannel"
@@ -49,24 +49,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, toRef } from 'vue'
-import useChannelSubscriptionState from '/@/composables/subscription/useChannelSubscriptionState'
 import { ChannelSubscribeLevel } from '@traptitech/traq'
+import { computed, toRef } from 'vue'
+import useStarChannel from './composables/useStarChannel'
+import HeaderToolsItem from '/@/components/Main/MainView/PrimaryViewHeader/PrimaryViewHeaderToolsItem.vue'
+import { useQall } from '/@/composables/qall/useQall'
+import useChannelSubscriptionState from '/@/composables/subscription/useChannelSubscriptionState'
 import { useResponsiveStore } from '/@/store/ui/responsive'
 import type { ChannelId } from '/@/types/entity-ids'
-import HeaderToolsItem from '/@/components/Main/MainView/PrimaryViewHeader/PrimaryViewHeaderToolsItem.vue'
-import useQall from './composables/useQall'
-import useStarChannel from './composables/useStarChannel'
 
 const props = withDefaults(
   defineProps<{
     channelId: ChannelId
-    isStared?: boolean
+    isStarred?: boolean
     isForcedChannel?: boolean
     isArchived?: boolean
   }>(),
   {
-    isStared: false,
+    isStarred: false,
     isForcedChannel: false,
     isArchived: false
   }
@@ -78,15 +78,9 @@ const emit = defineEmits<{
 
 const { isMobile } = useResponsiveStore()
 
-const {
-  isQallFeatureEnabled,
-  isQallSessionOpened,
-  canEndQall,
-  canToggleQall,
-  qallIconName,
-  qallLabel,
-  toggleQall
-} = useQall(props)
+const { joinQall, callingChannel } = useQall()
+const isCallingHere = computed(() => callingChannel.value === props.channelId)
+const disabled = computed(() => !!callingChannel.value && !isCallingHere.value)
 
 const { changeToNextSubscriptionLevel, currentChannelSubscription } =
   useChannelSubscriptionState(toRef(props, 'channelId'))
@@ -168,7 +162,7 @@ const { starChannel, unstarChannel } = useStarChannel(props)
 }
 .starIcon {
   transition: transform 0.1s;
-  &[data-is-stared] {
+  &[data-is-starred] {
     animation: spinAndPress 0.5s;
   }
   &:hover {

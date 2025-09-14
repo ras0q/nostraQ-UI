@@ -23,13 +23,14 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import AIcon from '/@/components/UI/AIcon.vue'
 import ASlider from '/@/components/UI/ASlider.vue'
-import { computed } from 'vue'
 
-const props = withDefaults(
+const volume = defineModel<number>('volume', { required: true })
+
+withDefaults(
   defineProps<{
-    volume: number
     keepExpanded?: boolean
     disabled?: boolean
   }>(),
@@ -39,20 +40,16 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits<{
-  (e: 'update:volume', _val: number): void
-}>()
-
 const roundedVolume = computed({
   get() {
-    return Math.floor(props.volume * 100)
+    return Math.floor(volume.value * 100)
   },
   set(v: number) {
-    emit('update:volume', v)
+    volume.value = v
   }
 })
 const toggleVolume = () => {
-  roundedVolume.value = props.volume > 0 ? 0 : 100
+  roundedVolume.value = volume.value > 0 ? 0 : 100
 }
 </script>
 
@@ -85,13 +82,19 @@ $afterVolumeSliderWidth: 48px;
   }
 }
 .volumeSlider {
-  transition: width ease 0.3s, margin ease 0.3s, opacity ease 0.25s;
+  transition:
+    width ease 0.3s,
+    margin ease 0.3s,
+    opacity ease 0.25s;
   width: 0;
   opacity: 0;
   margin: auto 0;
   .volume[data-keep-expanded='true'] &,
   .volume:hover & {
-    transition: width ease 0.3s, margin ease 0.3s, opacity ease 0.25s;
+    transition:
+      width ease 0.3s,
+      margin ease 0.3s,
+      opacity ease 0.25s;
     width: $afterVolumeSliderWidth;
     opacity: 1;
     margin: auto 8px;

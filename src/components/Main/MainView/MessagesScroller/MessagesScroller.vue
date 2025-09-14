@@ -28,32 +28,32 @@
         />
       </template>
     </div>
-    <div :class="$style.bottomSpacer"></div>
+    <div :class="$style.bottomSpacer" />
   </div>
 </template>
 
 <script lang="ts">
+import { throttle } from 'throttle-debounce'
 import type { Ref } from 'vue'
 import {
-  watch,
-  reactive,
   computed,
+  nextTick,
   onMounted,
   onUnmounted,
-  nextTick,
-  shallowRef
+  reactive,
+  shallowRef,
+  watch
 } from 'vue'
-import type { MessageId } from '/@/types/entity-ids'
-import type { LoadingDirection } from './composables/useMessagesFetcher'
-import useMessageScrollerElementResizeObserver from './composables/useMessageScrollerElementResizeObserver'
-import { throttle } from 'throttle-debounce'
-import { toggleSpoiler } from '/@/lib/markdown/spoiler'
-import { embeddingOrigin } from '/@/lib/apis'
 import { useRoute, useRouter } from 'vue-router'
-import { isMessageScrollerRoute, RouteName } from '/@/router'
+import useMessageScrollerElementResizeObserver from './composables/useMessageScrollerElementResizeObserver'
+import type { LoadingDirection } from './composables/useMessagesFetcher'
 import { useOpenLink } from '/@/composables/useOpenLink'
-import { useMainViewStore } from '/@/store/ui/mainView'
+import { embeddingOrigin } from '/@/lib/apis'
+import { toggleSpoiler } from '/@/lib/markdown/spoiler'
+import { isMessageScrollerRoute, RouteName } from '/@/router'
 import { useStampsStore } from '/@/store/entities/stamps'
+import { useMainViewStore } from '/@/store/ui/mainView'
+import type { MessageId } from '/@/types/entity-ids'
 
 const LOAD_MORE_THRESHOLD = 10
 
@@ -217,11 +217,22 @@ watch(
         state.height = newHeight
         return
       }
-      rootRef.value.scrollTo({
-        top: newHeight - state.height
-      })
-    }
-    state.height = newHeight
+      //上に追加された時はスクロール位置を変更する。
+      if (props.lastLoadingDirection === 'former') {
+        rootRef.value.scrollTo({
+          top: newHeight - state.height
+        })
+        state.height = newHeight
+      }
+
+      if (props.lastLoadingDirection === 'latest') {
+        // チャンネルを移動したとき、
+        rootRef.value.scrollTo({
+          top: newHeight
+        })
+        state.height = newHeight
+      }
+    } else state.height = newHeight
   },
   { deep: true, flush: 'post' }
 )

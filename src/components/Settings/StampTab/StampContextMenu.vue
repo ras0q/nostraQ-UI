@@ -10,6 +10,7 @@
         スタンプを編集する
       </button>
       <button
+        v-if="canDeleteStamp"
         :class="[$style.button, $style.dangerButton]"
         @click="withClose(deleteStamp)"
       >
@@ -29,6 +30,10 @@ import { useFileSelect } from '/@/composables/dom/useFileSelect'
 import apis from '/@/lib/apis'
 import useExecWithToast from '/@/composables/toast/useExecWithToast'
 import AIcon from '/@/components/UI/AIcon.vue'
+import { useMeStore } from '/@/store/domain/me'
+import { useStampsStore } from '/@/store/entities/stamps'
+import { UserPermission } from '@traptitech/traq'
+import { computed } from 'vue'
 
 const props = defineProps<{
   position: Point
@@ -41,8 +46,32 @@ const emit = defineEmits<{
 
 const { pushModal } = useModalStore()
 const { execWithToast } = useExecWithToast()
+const { detail, myId } = useMeStore()
+const { stampsMap } = useStampsStore()
 
-const acceptImageType = ['image/jpeg', 'image/png', 'image/gif'].join(',')
+const canDeleteStamp = computed(() => {
+  if (detail.value?.permissions.includes(UserPermission.DeleteStamp)) {
+    return true
+  }
+
+  if (!detail.value?.permissions.includes(UserPermission.DeleteMyStamp)) {
+    return false
+  }
+
+  const stamp = stampsMap.value.get(props.stampId)
+  if (!stamp) {
+    return false
+  }
+
+  return stamp.creatorId === myId.value
+})
+
+const acceptImageType = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/svg+xml'
+].join(',')
 
 const close = () => {
   emit('close')

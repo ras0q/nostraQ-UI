@@ -32,10 +32,7 @@
     <div :class="$style.element">
       <div :class="$style.container">
         <h3 :class="$style.header">カスタムテーマ</h3>
-        <edit-theme
-          v-if="state.type === 'custom'"
-          @change-theme="changeTheme"
-        />
+        <edit-theme v-if="state.type === 'custom'" />
       </div>
     </div>
 
@@ -47,18 +44,29 @@
             :key="category"
             :class="$style.category"
           >
-            <h4 class>{{ category }}</h4>
+            <h4 class>
+              {{ category }}
+            </h4>
             <div v-for="(color, name) in val" :key="name" :class="$style.color">
-              <p :class="$style.name">{{ name }}</p>
+              <p :class="$style.name">
+                {{ name }}
+              </p>
               <!-- eslint-disable vue/valid-v-model -->
               <!-- TODO: 自動適用じゃなくてバリデーションしてから適用するようにする -->
               <form-input
-                v-model="(val[name as keyof typeof val] as string)"
+                v-model="val[name as keyof typeof val] as string"
                 use-change-event
                 on-secondary
                 :class="$style.input"
               />
               <!-- eslint-enable vue/valid-v-model --->
+              <div>
+                <input
+                  v-model="val[name as keyof typeof val] as string"
+                  type="color"
+                  :class="$style.colorInput"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -136,17 +144,22 @@ const resetToDark = () => {
   .color {
     display: flex;
     margin: 4px 0;
+    gap: 0.5rem;
   }
   .name {
     @include color-ui-secondary;
-    margin-right: 8px;
   }
   .input {
     margin-left: auto;
   }
 }
 .resetButtonContainer {
+  margin-top: 1rem;
   display: flex;
   gap: 1rem;
+}
+.colorInput {
+  width: 3rem;
+  height: 100%;
 }
 </style>

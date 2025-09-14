@@ -24,6 +24,7 @@
         :step="step"
         @input="onInput"
         @change="onChange"
+        @focus="onFocus"
       />
       <span v-if="suffix" :class="$style.suffix" @click="focus">
         {{ suffix }}
@@ -50,19 +51,20 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends string | number">
+import { onMounted, shallowRef } from 'vue'
 import AIcon from '/@/components/UI/AIcon.vue'
 import LengthCount from '/@/components/UI/LengthCount.vue'
-import { onMounted, shallowRef } from 'vue'
-import { randomString } from '/@/lib/basic/randomString'
-import useInput from '/@/composables/useInput'
 import useShowPassword from '/@/composables/dom/useShowPassword'
+import useOnInput from '/@/composables/useOnInput'
+import { randomString } from '/@/lib/basic/randomString'
 import { isTouchDevice } from '/@/lib/dom/browser'
+
+const modelValue = defineModel<T>({ required: true })
 
 const props = withDefaults(
   defineProps<{
     type?: string
-    modelValue?: string | number
     onSecondary?: boolean
     placeholder?: string
     name?: string
@@ -76,22 +78,19 @@ const props = withDefaults(
     maxLength?: number
     useChangeEvent?: boolean
     focusOnMount?: boolean
+    selectOnFocus?: boolean
   }>(),
   {
     type: 'text',
-    modelValue: '',
     onSecondary: false,
     placeholder: '',
     useChangeEvent: false,
-    focusOnMount: false
+    focusOnMount: false,
+    selectOnFocus: false
   }
 )
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', _val: string | number): void
-}>()
-
-const { onInput: onInputInternal } = useInput(emit, 'update:modelValue')
+const onInputInternal = useOnInput(modelValue)
 
 const onInput = (e: Event) => {
   if (props.useChangeEvent) return
@@ -105,6 +104,12 @@ const onChange = (e: Event) => {
 const inputRef = shallowRef<HTMLInputElement | null>(null)
 const focus = () => {
   inputRef.value?.focus()
+}
+
+const onFocus = () => {
+  if (props.selectOnFocus) {
+    inputRef.value?.select()
+  }
 }
 
 const id = randomString()

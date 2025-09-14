@@ -35,6 +35,7 @@ interface NonDangerType extends Type {
 }
 interface DangerType extends Type {
   type?: 'primary' | 'secondary'
+  // eslint-disable-next-line vue/no-required-prop-with-default
   isDanger: true
 }
 
@@ -106,6 +107,7 @@ const spinnerColor = computed(() => {
 .label {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin: 8px 32px;
   .container[data-is-loading] & {

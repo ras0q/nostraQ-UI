@@ -5,15 +5,20 @@ import { convertToRefsStore } from '/@/store/utils/convertToRefsStore'
 
 const useResponsiveStorePinia = defineStore('ui/responsive', () => {
   const queryList = window.matchMedia(`(max-width: ${mobileMinBreakpoint}px)`)
+  const isHoverSupported = window.matchMedia(
+    '(hover: hover) and (pointer: fine)'
+  )
 
   const isMobile = ref(queryList.matches)
-
-  // safariではaddEventListener('change', func)が未対応なため
-  queryList.addListener((event: MediaQueryListEvent) => {
+  const isTouchDevice = ref(!isHoverSupported.matches)
+  queryList.addEventListener('change', (event: MediaQueryListEvent) => {
     isMobile.value = event.matches
   })
+  isHoverSupported.addEventListener('change', (event: MediaQueryListEvent) => {
+    isTouchDevice.value = event.matches
+  })
 
-  return { isMobile }
+  return { isMobile, isTouchDevice }
 })
 
 export const useResponsiveStore = convertToRefsStore(useResponsiveStorePinia)

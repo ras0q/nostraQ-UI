@@ -2,14 +2,16 @@
   <div :class="$style.container">
     <textarea-autosize
       ref="textareaAutosizeRef"
-      v-model="value"
+      v-model="modelValue"
       :class="$style.textarea"
-      :style="style"
+      :style="textareaAutosizeStyle"
       :readonly="isPosting"
       placeholder="メッセージを入力"
       rows="1"
       :data-simple-padding="simplePadding"
       :data-shrink-to-one-line="shrinkToOneLine"
+      :data-is-max-height-none="isMaxHeightNone"
+      :data-is-input-text-area-expanded="isInputTextAreaExpanded"
       :data-is-mobile="isMobile"
       :data-is-firefox="firefoxFlag"
       data-testid="message-input-textarea"
@@ -19,6 +21,7 @@
       @focus="onFocus"
       @blur="onBlur"
       @paste="onPaste"
+      @autosize-updated="updateShowIsInputTextareaExpandButtonVisibility"
     />
     <div :class="$style.over" />
     <dropdown-suggester
@@ -33,54 +36,60 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import useSendKeyWatcher from './composables/useSendKeyWatcher'
-import { useModelValueSyncer } from '/@/composables/useModelSyncer'
-import type { ChannelId } from '/@/types/entity-ids'
-import useWordSuggester from './composables/useWordSuggester'
-import useInsertText from '/@/composables/dom/useInsertText'
-import { getScrollbarWidth } from '/@/lib/dom/scrollbar'
-import { isFirefox } from '/@/lib/dom/browser'
-import { useResponsiveStore } from '/@/store/ui/responsive'
+import { computed, nextTick, ref, watch } from 'vue'
 import usePaste from './composables/usePaste'
-import TextareaAutosize from '/@/components/UI/TextareaAutosize.vue'
+import useSendKeyWatcher from './composables/useSendKeyWatcher'
+import useWordSuggester from './composables/useWordSuggester'
 import DropdownSuggester from './DropdownSuggester/DropdownSuggester.vue'
+import TextareaAutosize from '/@/components/UI/TextareaAutosize.vue'
+import useInsertText from '/@/composables/dom/useInsertText'
+import { isFirefox } from '/@/lib/dom/browser'
+import { getScrollbarWidth } from '/@/lib/dom/scrollbar'
+import { useResponsiveStore } from '/@/store/ui/responsive'
+import type { ChannelId } from '/@/types/entity-ids'
+
+const modelValue = defineModel<string>({ default: '' })
+const showTextAreaExpandButton = defineModel<boolean>(
+  'showTextAreaExpandButton',
+  {
+    default: false
+  }
+)
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string
     channelId?: ChannelId
     isPosting?: boolean
     simplePadding?: boolean
     shrinkToOneLine?: boolean
+    isMaxHeightNone?: boolean
+    isInputTextAreaExpanded?: boolean
   }>(),
   {
-    modelValue: '',
     channelId: '',
     isPosting: false,
     simplePadding: false,
-    shrinkToOneLine: false
+    shrinkToOneLine: false,
+    isMaxHeightNone: false,
+    isInputTextAreaExpanded: false
   }
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue'): void
   (e: 'focus'): void
   (e: 'blur'): void
   (e: 'addAttachments', _files: File[]): void
   (e: 'postMessage'): void
   (e: 'modifierKeyDown'): void
   (e: 'modifierKeyUp'): void
+  (e: 'autosize-updated'): void
 }>()
 
 const firefoxFlag = isFirefox()
 
-const value = useModelValueSyncer(props, emit)
 const { isMobile } = useResponsiveStore()
 
-const textareaAutosizeRef = ref<{
-  $el: HTMLTextAreaElement
-}>()
+const textareaAutosizeRef = ref<InstanceType<typeof TextareaAutosize>>()
 const textareaRef = computed(() => textareaAutosizeRef.value?.$el)
 
 defineExpose({ textareaAutosizeRef })
@@ -98,7 +107,7 @@ const {
   selectedCandidateIndex,
   confirmedPart,
   onSelect
-} = useWordSuggester(textareaRef, value)
+} = useWordSuggester(textareaRef, modelValue)
 
 const {
   onBeforeInput,
@@ -136,10 +145,43 @@ const onBlur = () => {
   emit('blur')
 }
 
+const textAreaAutoSizeMaxHeightShrunk = computed(() =>
+  isMobile.value ? 70 : 160
+)
+
+const textAreaAutoSizeMaxHeight = computed(() => {
+  if (props.isMaxHeightNone) {
+    return 'none'
+  }
+  return (
+    (props.isInputTextAreaExpanded
+      ? textAreaAutoSizeMaxHeightShrunk.value * 2
+      : textAreaAutoSizeMaxHeightShrunk.value) + 'px'
+  )
+})
+
 const scollbarWidth = getScrollbarWidth()
-const style = {
-  '--input-scrollbar-width': `${scollbarWidth}px`
+const textareaAutosizeStyle = computed(() => ({
+  '--input-scrollbar-width': `${scollbarWidth}px`,
+  '--max-height': textAreaAutoSizeMaxHeight.value
+}))
+
+const updateShowIsInputTextareaExpandButtonVisibility = () => {
+  nextTick(() => {
+    if (textareaRef.value) {
+      showTextAreaExpandButton.value =
+        textareaRef.value.scrollHeight > textAreaAutoSizeMaxHeightShrunk.value
+    }
+  })
 }
+
+watch(modelValue, updateShowIsInputTextareaExpandButtonVisibility, {
+  immediate: true
+})
+
+watch(textAreaAutoSizeMaxHeight, () => {
+  textareaAutosizeRef.value?.autosizeUpdateTextarea()
+})
 </script>
 
 <style lang="scss" module>
@@ -162,13 +204,10 @@ $vertical-padding: 8px;
   padding: $vertical-padding 16px;
   // 左から、余白、スタンプパレットボタン、余白、送信ボタン、スクロールバー
   padding-right: calc(8px + 24px + 8px + 24px + var(--input-scrollbar-width));
-  max-height: 160px;
+  max-height: var(--max-height);
   &[readonly] {
     @include color-ui-secondary-inactive;
     cursor: wait;
-  }
-  &[data-is-mobile='true'] {
-    max-height: 70px;
   }
   &[data-simple-padding='true'] {
     padding-right: 16px;
